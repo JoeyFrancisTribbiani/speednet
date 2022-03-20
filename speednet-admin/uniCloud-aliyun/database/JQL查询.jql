@@ -12,3 +12,8 @@
 db.collection('speednet-peer').get();
 db.collection('speednet-game-region').get();
 db.collection('speednet-peer','speednet-game-region').get();
+db.collection('uni-id-roles').get();
+db.collection('uni-id-users').field('username','role').get();
+db.collection('uni-id-users').where({
+				role: 'admin'
+			}).get()

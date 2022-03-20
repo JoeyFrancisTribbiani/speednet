@@ -20,20 +20,24 @@
 				<view>
 					<uni-section>区服列表</uni-section>
 					<uni-collapse accordion>
-						<uni-collapse-item v-for="(region,index) in data.regions" title-border="none" :border="false">
+						<uni-collapse-item v-for="(region,index) in data.regions" :key="index" title-border="none"
+							:border="false">
 							<template v-slot:title>
 								<uni-list>
-									<uni-list-item :title="region.text" :show-extra-icon="true" :extra-icon="regionIcon">
+									<uni-list-item :title="region.text" :show-extra-icon="true"
+										:extra-icon="regionIcon">
 									</uni-list-item>
 								</uni-list>
 							</template>
 							<view class="content">
 								<unicloud-db ref="udb" v-slot:default="{data, loading, error, options}" :options="data"
-									collection="speednet-peer" field="_id,peer_name" :where="`region_id=='${region.value}'`">
-								<uni-list>
-									<uni-list-item :to="'/pages/speednet-myspeed/list'" :title="peer.peer_name" :show-extra-icon="true" :extra-icon="peerIcon"
-										 v-for="(peer,ii) in data">{{peer.peer_name}}</uni-list-item>
-								</uni-list>
+									collection="speednet-peer" field="_id,peer_name"
+									:where="`region_id=='${region.value}'`">
+									<uni-list>
+										<uni-list-item :to="'/pages/speednet-myspeed/detail?id='+gameId+'&name='+options.game_name+'&peer_id='+peer._id +'&peer_name='+peer.peer_name" :title="peer.peer_name"
+											:show-extra-icon="true" :extra-icon="peerIcon" v-for="(peer,ii) in data"
+											:key="ii">{{peer.peer_name}}</uni-list-item>
+									</uni-list>
 								</unicloud-db>
 							</view>
 						</uni-collapse-item>
@@ -55,8 +59,17 @@
 	export default {
 		data() {
 			return {
-				regionIcon: {color: 'red',size: '22',type: 'fire-filled'},
-				peerIcon: {color: '#4cd964',size: '22',type: 'map-pin-ellipse'},
+				gameId: '',
+				regionIcon: {
+					color: 'red',
+					size: '22',
+					type: 'fire-filled'
+				},
+				peerIcon: {
+					color: '#4cd964',
+					size: '22',
+					type: 'map-pin-ellipse'
+				},
 				queryWhere: '',
 				peerList: [],
 				mypeerList: [],
@@ -75,6 +88,7 @@
 		},
 		onLoad(e) {
 			this._id = e.id
+			this.gameId = e.id
 		},
 		onReady() {
 			if (this._id) {

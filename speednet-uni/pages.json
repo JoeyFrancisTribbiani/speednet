@@ -27,7 +27,7 @@
 		}, {
 			"path": "pages/list/search/search",
 			"style": {
-				"navigationBarTitleText":"搜索"
+				"navigationBarTitleText": "搜索"
 			}
 		}, {
 			"path": "pages/list/detail",
@@ -143,7 +143,7 @@
 				"navigationBarTitleText": "注册",
 				"enablePullDownRefresh": false
 			}
-		},{
+		}, {
 			"path": "pages/ucenter/login-page/register/phone-number",
 			"style": {
 				"navigationBarTitleText": "注册",
@@ -175,92 +175,83 @@
 				"navigationBarTitleText": "意见反馈",
 				"enablePullDownRefresh": false
 			}
+		}, {
+			"path": "pages/speednet-membership/add",
+			"style": {
+				"navigationBarTitleText": "新增"
+			}
+		}, {
+			"path": "pages/speednet-membership/edit",
+			"style": {
+				"navigationBarTitleText": "编辑"
+			}
+		}, {
+			"path": "pages/speednet-membership/list",
+			"style": {
+				"navigationBarTitleText": "列表"
+			}
+		}, {
+			"path": "pages/speednet-membership/memberCenter",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/speednet-game/add",
+			"style": {
+				"navigationBarTitleText": "新增"
+			}
+		}, {
+			"path": "pages/speednet-game/edit",
+			"style": {
+				"navigationBarTitleText": "编辑"
+			}
+		}, {
+			"path": "pages/speednet-game/list",
+			"style": {
+				"navigationBarTitleText": "列表"
+			}
+		}, {
+			"path": "pages/speednet-game/detail",
+			"style": {
+				"navigationBarTitleText": "选择区服"
+			}
+		}, {
+			"path": "pages/speednet-myspeed/list",
+			"style": {
+				"navigationBarTitleText": "我的加速"
+			}
+		}, {
+			"path": "pages/speednet-myspeed/detail",
+			"style": {
+				"navigationBarTitleText": "我的加速"
+			}
+		}, {
+			"path": "pages/speednet-membership/detail",
+			"style": {
+				"navigationBarTitleText": "详情"
+			}
+		}, {
+			"path": "pages/speednet-member-plan/add",
+			"style": {
+				"navigationBarTitleText": "新增"
+			}
+		}, {
+			"path": "pages/speednet-member-plan/edit",
+			"style": {
+				"navigationBarTitleText": "编辑"
+			}
+		}, {
+			"path": "pages/speednet-member-plan/list",
+			"style": {
+				"navigationBarTitleText": "列表"
+			}
+		}, {
+			"path": "pages/speednet-member-plan/detail",
+			"style": {
+				"navigationBarTitleText": "详情"
+			}
 		}
-    ,{
-    "path": "pages/speednet-membership/add",
-    "style": {
-        "navigationBarTitleText": "新增"
-    }
-}
-,{
-    "path": "pages/speednet-membership/edit",
-    "style": {
-        "navigationBarTitleText": "编辑"
-    }
-}
-,{
-    "path": "pages/speednet-membership/list",
-    "style": {
-        "navigationBarTitleText": "列表"
-    }
-}
-,{
-    "path": "pages/speednet-game/add",
-    "style": {
-        "navigationBarTitleText": "新增"
-    }
-}
-,{
-    "path": "pages/speednet-game/edit",
-    "style": {
-        "navigationBarTitleText": "编辑"
-    }
-}
-,{
-    "path": "pages/speednet-game/list",
-    "style": {
-        "navigationBarTitleText": "列表"
-    }
-}
-,{
-    "path": "pages/speednet-game/detail",
-    "style": {
-        "navigationBarTitleText": "选择区服"
-    }
-}
-,{
-    "path": "pages/speednet-myspeed/list",
-    "style": {
-        "navigationBarTitleText": "我的加速"
-    }
-}
-,{
-    "path": "pages/speednet-myspeed/detail",
-    "style": {
-        "navigationBarTitleText": "我的加速"
-    }
-}
-,{
-    "path": "pages/speednet-membership/detail",
-    "style": {
-        "navigationBarTitleText": "详情"
-    }
-}
-,{
-    "path": "pages/speednet-member-plan/add",
-    "style": {
-        "navigationBarTitleText": "新增"
-    }
-}
-,{
-    "path": "pages/speednet-member-plan/edit",
-    "style": {
-        "navigationBarTitleText": "编辑"
-    }
-}
-,{
-    "path": "pages/speednet-member-plan/list",
-    "style": {
-        "navigationBarTitleText": "列表"
-    }
-}
-,{
-    "path": "pages/speednet-member-plan/detail",
-    "style": {
-        "navigationBarTitleText": "详情"
-    }
-}
-],
+	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-starter",
@@ -290,22 +281,23 @@
 		"selectedColor": "#007AFF",
 		"borderStyle": "black",
 		"backgroundColor": "#FFFFFF",
-		"list": [  {
-			"pagePath": "pages/list/list",
-			"iconPath": "static/tabbar/grid.png",
-			"selectedIconPath": "static/tabbar/grid_active.png",
-			"text": "游戏"
-		},
-		{
-			"pagePath": "pages/grid/grid",
-			"iconPath": "static/tabbar/list.png",
-			"selectedIconPath": "static/tabbar/list_active.png",
-			"text": "加速"
-		},{
-			"pagePath": "pages/ucenter/ucenter",
-			"iconPath": "static/tabbar/me.png",
-			"selectedIconPath": "static/tabbar/me_active.png",
-			"text": "我的"
-		}]
+		"list": [{
+				"pagePath": "pages/list/list",
+				"iconPath": "static/tabbar/grid.png",
+				"selectedIconPath": "static/tabbar/grid_active.png",
+				"text": "游戏"
+			},
+			{
+				"pagePath": "pages/grid/grid",
+				"iconPath": "static/tabbar/list.png",
+				"selectedIconPath": "static/tabbar/list_active.png",
+				"text": "加速"
+			}, {
+				"pagePath": "pages/speednet-membership/memberCenter",
+				"iconPath": "static/tabbar/me.png",
+				"selectedIconPath": "static/tabbar/me_active.png",
+				"text": "我的"
+			}
+		]
 	}
 }

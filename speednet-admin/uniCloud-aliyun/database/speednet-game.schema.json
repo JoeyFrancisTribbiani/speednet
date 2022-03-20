@@ -2,9 +2,9 @@
 	"bsonType": "object",
 	"required": ["game_name", "processes", "port"],
 	"permission": {
-		"read": "doc.user_id == auth.uid",
+		"read": true,
 		"create": true,
-		"update": false,
+		"update": true,
 		"delete": false
 	},
 	"properties": {

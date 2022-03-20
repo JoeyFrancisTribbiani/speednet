@@ -2,17 +2,6 @@
 
 
 const validator = {
-  "plan_id": {
-    "rules": [
-      {
-        "required": true
-      },
-      {
-        "format": "int"
-      }
-    ],
-    "label": "订阅计划"
-  },
   "hours": {
     "rules": [
       {
@@ -40,6 +29,30 @@ const validator = {
     ],
     "label": "本计划有效期"
   },
+  "enable": {
+    "rules": [
+      {
+        "format": "bool"
+      }
+    ],
+    "label": "是否启用"
+  },
+  "tag": {
+    "rules": [
+      {
+        "format": "string"
+      }
+    ],
+    "label": "优惠标签"
+  },
+  "show_tag": {
+    "rules": [
+      {
+        "format": "bool"
+      }
+    ],
+    "label": "是否显示标签"
+  },
   "comment": {
     "rules": [
       {
@@ -47,6 +60,17 @@ const validator = {
       }
     ],
     "label": "说明"
+  },
+  "plan_id": {
+    "rules": [
+      {
+        "required": true
+      },
+      {
+        "format": "int"
+      }
+    ],
+    "label": "订阅计划"
   }
 }
 

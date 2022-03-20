@@ -6,5 +6,7 @@
 // 详细JQL语法，请参考 https://uniapp.dcloud.net.cn/uniCloud/clientdb?id=jsquery
 
 // 下面示例查询uni-id-users表的所有数据
-db.collection('uni-id-users').get();
+
 db.collection('speednet-game').where("status" == 1).getTemp();
+db.collection('uni-id-users').get();
+db.collection('speednet-membership').get()

@@ -2,7 +2,7 @@
 	"bsonType": "object",
 	"required": ["user_id", "score", "balance", "start_time", "end_time"],
 	"permission": {
-		"read": "doc.user_id == auth.uid",
+		"read": true,
 		"create": "user_id == 622827847231600001948fc8",
 		"update": false,
 		"delete": false
@@ -27,6 +27,14 @@
 		"balance": {
 			"bsonType": "int",
 			"description": "变化后的积分余额"
+		},
+		"remaining_minites": {
+			"bsonType": "int",
+			"title": "剩余分钟数"
+		},
+		"is_pause": {
+			"bsonType": "int",
+			"title": "是否暂停计时"
 		},
 		"comment": {
 			"bsonType": "string",

@@ -2,7 +2,7 @@
 	"bsonType": "object",
 	"required": ["region_name"],
 	"permission": {
-		"read": "doc.user_id == auth.uid",
+		"read": true,
 		"create": true,
 		"update": false,
 		"delete": false

@@ -1,9 +1,6 @@
 <template>
   <view class="uni-container">
     <uni-forms ref="form" :value="formData" validate-trigger="submit" err-show-type="toast">
-      <uni-forms-item name="plan_id" label="订阅计划" required>
-        <uni-easyinput placeholder="订阅计划id" type="number" v-model="formData.plan_id"></uni-easyinput>
-      </uni-forms-item>
       <uni-forms-item name="hours" label="本计划小时数">
         <uni-easyinput placeholder="会员订阅计划的小时数" type="number" v-model="formData.hours"></uni-easyinput>
       </uni-forms-item>
@@ -13,8 +10,20 @@
       <uni-forms-item name="last_days" label="本计划有效期">
         <uni-easyinput placeholder="有效期" type="number" v-model="formData.last_days"></uni-easyinput>
       </uni-forms-item>
+      <uni-forms-item name="enable" label="是否启用">
+        <switch @change="binddata('enable', $event.detail.value)" :checked="formData.enable"></switch>
+      </uni-forms-item>
+      <uni-forms-item name="tag" label="优惠标签">
+        <uni-easyinput placeholder="优惠标签" v-model="formData.tag"></uni-easyinput>
+      </uni-forms-item>
+      <uni-forms-item name="show_tag" label="是否显示标签">
+        <switch @change="binddata('show_tag', $event.detail.value)" :checked="formData.show_tag"></switch>
+      </uni-forms-item>
       <uni-forms-item name="comment" label="说明">
         <uni-easyinput placeholder="说明" v-model="formData.comment" trim="both"></uni-easyinput>
+      </uni-forms-item>
+      <uni-forms-item name="plan_id" label="订阅计划" required>
+        <uni-easyinput placeholder="订阅计划id" type="number" v-model="formData.plan_id"></uni-easyinput>
       </uni-forms-item>
       <view class="uni-button-group">
         <button type="primary" class="uni-button" @click="submit">提交</button>
@@ -42,11 +51,14 @@
   export default {
     data() {
       let formData = {
-        "plan_id": null,
         "hours": null,
         "price": null,
         "last_days": null,
-        "comment": ""
+        "enable": null,
+        "tag": "",
+        "show_tag": null,
+        "comment": "",
+        "plan_id": null
       }
       return {
         formData,
@@ -110,7 +122,7 @@
         uni.showLoading({
           mask: true
         })
-        db.collection(dbCollectionName).doc(id).field("plan_id,hours,price,last_days,comment").get().then((res) => {
+        db.collection(dbCollectionName).doc(id).field("hours,price,last_days,enable,tag,show_tag,comment,plan_id").get().then((res) => {
           const data = res.result.data[0]
           if (data) {
             this.formData = data

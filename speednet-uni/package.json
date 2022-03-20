@@ -4,12 +4,12 @@
 	"version": "1.1.32",
 	"description": "云端一体应用快速开发基本项目模版",
 	"keywords": [
-        "login",
-        "登录",
-        "搜索",
-        "uni-id实例",
-        "留言板"
-    ],
+		"login",
+		"登录",
+		"搜索",
+		"uni-id实例",
+		"留言板"
+	],
 	"repository": "https://gitcode.net/dcloud/uni-starter",
 	"engines": {
 		"HBuilderX": "^3.2.6"
@@ -81,5 +81,7 @@
 			}
 		}
 	},
-	"dependencies": {}
+	"dependencies": {
+		"vue-awesome-progress": "^1.9.7"
+	}
 }

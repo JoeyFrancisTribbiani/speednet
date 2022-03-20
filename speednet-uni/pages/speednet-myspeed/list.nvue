@@ -22,7 +22,7 @@
 
 				<!-- 列表渲染 -->
 				<uni-list-item :to="'/pages/speednet-myspeed/detail?id='+item._id+'&name='+item.game_name" v-for="(item,index) in data"
-					:key="index" :clickable="'true'" :direction="'row'" :rightText="'一键加速'"  
+					:key="index" :clickable="true" :direction="'row'" :rightText="'一键加速'"  
 					:showArrow="'true'" >
 					<!-- 通过header插槽定义列表左侧图片 -->
 					<template v-slot:header>

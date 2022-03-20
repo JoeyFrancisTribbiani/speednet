@@ -1,15 +1,11 @@
 <template>
   <view class="container">
-    <unicloud-db ref="udb" v-slot:default="{data, loading, error, options}" :options="options" collection="speednet-member-plan" field="plan_id,hours,price,last_days,comment" :where="queryWhere" :getone="true" :manual="true">
+    <unicloud-db ref="udb" v-slot:default="{data, loading, error, options}" :options="options" collection="speednet-member-plan" field="hours,price,last_days,enable,tag,show_tag,comment,plan_id" :where="queryWhere" :getone="true" :manual="true">
       <view v-if="error">{{error.message}}</view>
       <view v-else-if="loading">
         <uni-load-more :contentText="loadMore" status="loading"></uni-load-more>
       </view>
       <view v-else-if="data">
-        <view>
-          <text>订阅计划</text>
-          <text>{{data.plan_id}}</text>
-        </view>
         <view>
           <text>本计划小时数</text>
           <text>{{data.hours}}</text>
@@ -23,8 +19,24 @@
           <text>{{data.last_days}}</text>
         </view>
         <view>
+          <text>是否启用</text>
+          <text>{{data.enable == true ? '✅' : '❌'}}</text>
+        </view>
+        <view>
+          <text>优惠标签</text>
+          <text>{{data.tag}}</text>
+        </view>
+        <view>
+          <text>是否显示标签</text>
+          <text>{{data.show_tag == true ? '✅' : '❌'}}</text>
+        </view>
+        <view>
           <text>说明</text>
           <text>{{data.comment}}</text>
+        </view>
+        <view>
+          <text>订阅计划</text>
+          <text>{{data.plan_id}}</text>
         </view>
       </view>
     </unicloud-db>

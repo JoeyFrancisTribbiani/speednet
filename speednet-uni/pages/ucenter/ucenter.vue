@@ -2,7 +2,8 @@
 	<view class="center">
 		<uni-sign-in ref="signIn"></uni-sign-in>
 		<view class="userInfo" @click.capture="toUserInfo">
-			<cloud-image width="150rpx" height="150rpx" v-if="userInfo.avatar_file&&userInfo.avatar_file.url" :src="userInfo.avatar_file.url"></cloud-image>
+			<cloud-image width="150rpx" height="150rpx" v-if="userInfo.avatar_file&&userInfo.avatar_file.url"
+				:src="userInfo.avatar_file.url"></cloud-image>
 			<image v-else class="logo-img" src="@/static/uni-center/defaultAvatarUrl.png"></image>
 			<view class="logo-title">
 				<text class="uer-name" v-if="hasLogin">{{userInfo.nickname||userInfo.username||userInfo.mobile}}</text>
@@ -44,9 +45,11 @@
 	const db = uniCloud.database();
 	export default {
 		// #ifdef APP
-		onBackPress({from}) {
-			if(from=='backbutton'){
-				this.$nextTick(function(){
+		onBackPress({
+			from
+		}) {
+			if (from == 'backbutton') {
+				this.$nextTick(function() {
 					uniShare.hide()
 				})
 				return uniShare.isShow;
@@ -94,7 +97,7 @@
 						},
 						//#endif
 						{
-							"title":this.$t('mine.readArticles'),
+							"title": this.$t('mine.readArticles'),
 							"to": '/pages/ucenter/read-news-log/read-news-log',
 							"icon": "flag"
 						},
@@ -143,7 +146,7 @@
 			// console.log(313,this.userInfo,this.hasLogin);
 			//#ifdef APP-PLUS
 			this.ucenterList[this.ucenterList.length - 2].unshift({
-				title:this.$t('mine.checkUpdate'),// this.this.$t('mine.checkUpdate')"检查更新"
+				title: this.$t('mine.checkUpdate'), // this.this.$t('mine.checkUpdate')"检查更新"
 				rightText: this.appVersion.version + '-' + this.appVersion.versionCode,
 				event: 'checkVersion',
 				icon: 'loop',
@@ -179,7 +182,7 @@
 			signIn() { //普通签到
 				this.$refs.signIn.open()
 			},
-			signInByAd(){ //看激励视频广告签到
+			signInByAd() { //看激励视频广告签到
 				this.$refs.signIn.showRewardedVideoAd()
 			},
 			/**
@@ -210,7 +213,7 @@
 			tapGrid(index) {
 				uni.showToast({
 					// title: '你点击了，第' + (index + 1) + '个',
-					title: this.$t('mine.clicked') + " " + (index + 1) ,
+					title: this.$t('mine.clicked') + " " + (index + 1),
 					icon: 'none'
 				});
 			},
@@ -255,12 +258,12 @@
 						console.log(res);
 						const data = res.result.data[0];
 						let msg = '';
-						msg = data ? (this.$t('mine.currentScore')+ data.balance) : this.$t('mine.noScore');
+						msg = data ? (this.$t('mine.currentScore') + data.balance) : this.$t('mine.noScore');
 						uni.showToast({
 							title: msg,
 							icon: 'none'
 						});
-					}).finally(()=>{
+					}).finally(() => {
 						uni.hideLoading()
 					})
 			},
@@ -355,6 +358,7 @@
 	page {
 		background-color: #f8f8f8;
 	}
+
 	/* #endif*/
 
 	.center {

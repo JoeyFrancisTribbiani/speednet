@@ -11,11 +11,6 @@
 		"_id": {
 			"description": "ID，系统自动生成"
 		},
-		"plan_id": {
-			"bsonType": "int",
-			"title": "订阅计划",
-			"description": "订阅计划id"
-		},
 		"hours": {
 			"bsonType": "int",
 			"title": "本计划小时数",
@@ -30,6 +25,21 @@
 			"bsonType": "int",
 			"title": "本计划有效期",
 			"description": "有效期"
+		},
+		"enable": {
+			"bsonType": "bool",
+			"title": "是否启用",
+			"description": "是否启用本计划"
+		},
+		"tag": {
+			"bsonType": "string",
+			"title": "优惠标签",
+			"description": "优惠标签"
+		},
+		"show_tag": {
+			"bsonType": "bool",
+			"title": "是否显示标签",
+			"description": "是否显示标签"
 		},
 		"comment": {
 			"bsonType": "string",

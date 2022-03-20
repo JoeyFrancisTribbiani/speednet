@@ -1,8 +1,8 @@
 {
 	"bsonType": "object",
-	"required": ["peer_name","region_id", "server", "port"],
+	"required": ["peer_name", "region_id", "server", "port"],
 	"permission": {
-		"read": "doc.user_id == auth.uid",
+		"read": true,
 		"create": true,
 		"update": false,
 		"delete": false

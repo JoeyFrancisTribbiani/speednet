@@ -43,7 +43,17 @@
 				</view>
 			</view>
 		</unicloud-db>
-		<button type="primary" @click="startSpeed">启动加速</button>
+		<view class="circle">
+			<vue-awesome-progress :circle-radius="120" :circle-width="4" :line-width="33" :font-size="35"
+				:point-radius="20" :percentage="progress" :duration="dur" :point-color="'#3B77E3'"
+				:font-color="'#3B77E3'" :use-gradient='true' />
+		</view>
+		<!-- 		  :format="formatPeople"
+		  easing="0,0,.35,.43" -->
+
+		<view class=".btns">
+			<button type="primary" @click="startSpeed">启动加速</button>
+		</view>
 	</view>
 </template>
 
@@ -55,31 +65,22 @@
 	import {
 		mapGetters
 	} from 'vuex';
+	import VueAwesomeProgress from "vue-awesome-progress"
+
+
 	const db = uniCloud.database();
 
 	export default {
+		components: {
+			VueAwesomeProgress
+		},
 		data() {
 			return {
-				regionIcon: {
-					color: 'red',
-					size: '22',
-					type: 'fire-filled'
-				},
-				peerIcon: {
-					color: '#4cd964',
-					size: '22',
-					type: 'map-pin-ellipse'
-				},
+				progress: 0,
+				dur: 0,
+				// peer_id:'',
+				// peer_name:'',
 				queryWhere: '',
-				peerList: [],
-				mypeerList: [],
-				peerWhere: '',
-				chooseRegion: '',
-				loadMore: {
-					contentdown: '',
-					contentrefresh: '',
-					contentnomore: ''
-				},
 				options: {
 					// 将scheme enum 属性静态数据中的value转成text
 					...enumConverter
@@ -88,9 +89,11 @@
 		},
 		onLoad(e) {
 			this.userId = this.userInfo()._id
-			console.log('userid getted:'+JSON.stringify(this.userId))
-			console.log('userid getted:'+this.userId)
+			console.log('userid getted:' + JSON.stringify(this.userId))
+			console.log('userid getted:' + this.userId)
 			this.gameName = e.name
+			this.peerId = e.peer_id
+			this.peerName = e.peer_name
 		},
 		onReady() {
 			if (this._id) {
@@ -106,14 +109,53 @@
 				userInfo: 'user/info'
 			}),
 			async startSpeed() {
+				this.dur = 5
+				this.progress = 20
 				let res = await db.collection('speednet-membership').where('user_id=="' + this.userId + '"').get()
 				// .field("_id,peer_name,server").get()
 				console.log(res)
-				if ( res.result.data.length == 0){
-					uni.navigateTo({
-						url: '/pages/speednet-member-plan/list',
-						animationType: 'fade-in'
+				this.progress = 50
+
+				if (res.result.data.length == 0) {
+					uni.showToast({
+						title: '会员时长不足，请先购买订阅',
+						icon: 'error',
 					});
+					setTimeout(function() {
+						uni.hideToast();
+						uni.navigateTo({
+							url: '/pages/speednet-member-plan/list',
+							animationType: 'fade-in'
+						});
+					}, 2000);
+				} else {
+					let membership = res.result.data[0]
+					if (membership.is_pause) {
+						uni.showToast({
+							title: '您的加速已暂停，请先恢复加速',
+							icon: 'error',
+						});
+						this.progress = 70;
+					} else if (membership.remaining_minites == 0) {
+						uni.showToast({
+							title: '会员时长不足，请先购买订阅',
+							icon: 'error',
+						});
+						this.progress = 0;
+					} else {
+						let res = await db.collection("speednet-peer").where('_id=="' + this.peerId + '"').get()
+
+						var Context = plus.android.importClass("android.content.Context");
+						var InputMethodManager = plus.android.importClass(
+							"android.view.inputmethod.InputMethodManager");
+						var main = plus.android.runtimeMainActivity();
+						var imm = main.getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+						
+						
+						this.progress = 90;
+						console.log(res.result)
+					}
 				}
 			},
 			async showPeers(regionId) {
@@ -144,25 +186,35 @@
 	}
 </script>
 
-<style>
+<style scoped="">
+	.circle {
+		margin: 20px;
+		padding: 20px;
+	}
+
 	.region-tag {
 		margin: 20px;
 	}
 
 	.container {
 		padding: 10px;
+		display: flex;
+		align-items: center;
+		flex-direction: column;
 	}
 
 	.btns {
-		margin-top: 10px;
+		margin-top: 30px;
+		padding-top: 300px;
+		width: 300px;
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		flex-direction: row;
+		/* flex-direction: row; */
 	}
 
 	.btns button {
-		flex: 1;
+		flex: 100;
 	}
 
 	.btn-delete {
