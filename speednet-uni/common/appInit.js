@@ -119,29 +119,29 @@ export default async function() {
 			if (args.data && args.key == 'uni_id_token') {
 				let oldToken = uni.getStorageSync('uni_id_token')
 				if(oldToken.length){
-					console.log('监听到token更新，就刷新push_clientid的有效期');
+					// console.log('监听到token更新，就刷新push_clientid的有效期');
 					// #ifdef APP-PLUS
-					let push_clientid;
-					try {
-						push_clientid = plus.push.getClientInfo().clientid
-					} catch (e) {
-						uni.showModal({
-							content: '获取推送标识失败。如果你的应用不需要推送功能，请注释掉本代码块',
-							showCancel: false,
-							confirmText: "好的"
-						});
-						console.log(e)
-					}
-					uniCloud.callFunction({
-						name:'uni-id-cf',
-						data:{
-							"action": "renewDeviceTokenExpiredxpired",
-							"params": {push_clientid}
-						},
-						complete: (e) => {
-							console.log(e);
-						}
-					})
+					// let push_clientid;
+					// try {
+					// 	push_clientid = plus.push.getClientInfo().clientid
+					// } catch (e) {
+					// 	uni.showModal({
+					// 		content: '获取推送标识失败。如果你的应用不需要推送功能，请注释掉本代码块',
+					// 		showCancel: false,
+					// 		confirmText: "好的"
+					// 	});
+					// 	console.log(e)
+					// }
+					// uniCloud.callFunction({
+					// 	name:'uni-id-cf',
+					// 	data:{
+					// 		"action": "renewDeviceTokenExpiredxpired",
+					// 		"params": {push_clientid}
+					// 	},
+					// 	complete: (e) => {
+					// 		console.log(e);
+					// 	}
+					// })
 					// #endif
 				}
 			}
@@ -207,10 +207,14 @@ export default async function() {
 				console.error(e);
 			} else {
 				uni.showModal({
-					content: "系统错误请稍后再试！",
-					showCancel: false,
-					confirmText: "知道了"
+					content: JSON.stringify(e),
+					showCancel: false
 				});
+				// uni.showModal({
+				// 	content: "系统错误请稍后再试！",
+				// 	showCancel: false,
+				// 	confirmText: "知道了"
+				// });
 			}
 			//如果执行错误，检查是否断网
 			uni.getNetworkType({
@@ -492,16 +496,16 @@ async function getDeviceInfo() {
 		}),
 		idfa = plus.storage.getItem('idfa') || '', //idfa有需要的用户在应用首次启动时自己获取存储到storage中
 		vendor = plus.device.vendor;
-	try {
-		deviceInfo.push_clientid = plus.push.getClientInfo().clientid
-	} catch (e) {
-		uni.showModal({
-			content: '获取推送标识失败。如果你的应用不需要推送功能，请注释掉本代码块',
-			showCancel: false,
-			confirmText: "好的"
-		});
-		console.log(e)
-	}
+	// try {
+	// 	deviceInfo.push_clientid = plus.push.getClientInfo().clientid
+	// } catch (e) {
+	// 	uni.showModal({
+	// 		content: '获取推送标识失败。如果你的应用不需要推送功能，请注释掉本代码块',
+	// 		showCancel: false,
+	// 		confirmText: "好的"
+	// 	});
+	// 	console.log(e)
+	// }
 	Object.assign(deviceInfo, {
 		imei,
 		uuid,

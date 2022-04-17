@@ -16,13 +16,14 @@
       </view>
     </view>
     <view class="uni-container">
-      <unicloud-db ref="udb" :collection="collectionList" field="game_name,processes,picture,regions,platform,status" :where="where" page-data="replace"
+      <unicloud-db ref="udb" :collection="collectionList" field="game_name,processes,ips,picture,regions,platform,status" :where="where" page-data="replace"
         :orderby="orderby" :getcount="true" :page-size="options.pageSize" :page-current="options.pageCurrent"
         v-slot:default="{data,pagination,loading,error,options}" :options="options" loadtime="manual" @load="onqueryload">
         <uni-table ref="table" :loading="loading" :emptyText="error.message || '没有更多数据'" border stripe type="selection" @selection-change="selectionChange">
           <uni-tr>
             <uni-th align="center" filter-type="search" @filter-change="filterChange($event, 'game_name')" sortable @sort-change="sortChange($event, 'game_name')">游戏名称</uni-th>
-            <uni-th align="center" filter-type="search" @filter-change="filterChange($event, 'processes')" sortable @sort-change="sortChange($event, 'processes')">进程名（多个逗号隔开）</uni-th>
+            <!-- <uni-th align="center" filter-type="search" @filter-change="filterChange($event, 'processes')" sortable @sort-change="sortChange($event, 'processes')">进程名（多个逗号隔开）</uni-th> -->
+            <!-- <uni-th align="center" filter-type="search" @filter-change="filterChange($event, 'ips')" sortable @sort-change="sortChange($event, 'ips')">服务器IP（多个逗号隔开）</uni-th> -->
             <uni-th align="center" sortable @sort-change="sortChange($event, 'picture')">游戏封面</uni-th>
             <uni-th align="center">区服列表</uni-th>
             <uni-th align="center" filter-type="select" :filter-data="options.filterData.platform_localdata" @filter-change="filterChange($event, 'platform')">游戏平台</uni-th>
@@ -31,13 +32,14 @@
           </uni-tr>
           <uni-tr v-for="(item,index) in data" :key="index">
             <uni-td align="center">{{item.game_name}}</uni-td>
-            <uni-td align="center">{{item.processes}}</uni-td>
+            <!-- <uni-td align="center">{{item.processes}}</uni-td> -->
+            <!-- <uni-td align="center">{{item.ips}}</uni-td> -->
             <uni-td align="center">
               <uni-file-picker v-if="item.picture && item.picture.fileType == 'image'" :value="item.picture" :file-mediatype="item.picture && item.picture.fileType" return-type="object" :imageStyles="imageStyles" readonly></uni-file-picker>
               <uni-link v-else :href="item.picture && item.picture.url" :text="item.picture && item.picture.url"></uni-link>
             </uni-td>
             <!-- <uni-td align="center">{{item.regions && item.regions[0] && item.regions[0].text}}</uni-td> -->
-            <uni-td align="center"><span v-for="(value,index) in item.regions">[{{value.region_name}}]</span> </uni-td>
+			<uni-td align="center"><span v-for="(value,index) in item.regions">[{{value.region_name}}]</span> </uni-td>
             <uni-td align="center">{{options.platform_valuetotext[item.platform]}}</uni-td>
             <uni-td align="center">{{options.status_valuetotext[item.status]}}</uni-td>
             <uni-td align="center">
@@ -75,7 +77,7 @@
   export default {
     data() {
       return {
-        collectionList: [ db.collection('speednet-game').getTemp(), db.collection('speednet-game-region').getTemp() ],
+        collectionList: [ db.collection('speednet-game').orderBy('create_date',"desc").getTemp(), db.collection('speednet-game-region').getTemp() ],
         query: '',
         where: '',
         orderby: dbOrderBy,
@@ -118,6 +120,7 @@
           "fields": {
             "游戏名称": "game_name",
             "进程名（多个逗号隔开）": "processes",
+            "服务器IP（多个逗号隔开）": "ips",
             "游戏封面": "picture",
             "区服列表": "regions",
             "游戏平台": "platform",

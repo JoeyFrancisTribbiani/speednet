@@ -7,6 +7,9 @@
       <uni-forms-item name="processes" label="进程名（多个逗号隔开）" required>
         <uni-easyinput placeholder="进程名（可以是多个，逗号隔开）" v-model="formData.processes"></uni-easyinput>
       </uni-forms-item>
+      <uni-forms-item name="ips" label="服务器IP（多个逗号隔开）">
+        <uni-easyinput placeholder="服务器IP（可以是多个，逗号隔开）" v-model="formData.ips"></uni-easyinput>
+      </uni-forms-item>
       <uni-forms-item name="picture" label="游戏封面">
         <uni-file-picker file-mediatype="image" file-extname="jpg,png" return-type="object" v-model="formData.picture"></uni-file-picker>
       </uni-forms-item>
@@ -51,6 +54,7 @@
       let formData = {
         "game_name": "",
         "processes": "",
+        "ips": "",
         "picture": null,
         "regions": [],
         "platform": null,
@@ -138,7 +142,7 @@
         uni.showLoading({
           mask: true
         })
-        db.collection(dbCollectionName).doc(id).field("game_name,processes,picture,regions,platform,status").get().then((res) => {
+        db.collection(dbCollectionName).doc(id).field("game_name,processes,ips,picture,regions,platform,status").get().then((res) => {
           const data = res.result.data[0]
           if (data) {
             this.formData = data

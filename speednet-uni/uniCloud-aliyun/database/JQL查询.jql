@@ -7,6 +7,7 @@
 
 // 下面示例查询uni-id-users表的所有数据
 
-db.collection('speednet-game').where("status" == 1).getTemp();
+db.collection('speednet-game').where('"status" == 1').get();
 db.collection('uni-id-users').get();
+db.collection('speednet-membership').remove();
 db.collection('speednet-membership').get()

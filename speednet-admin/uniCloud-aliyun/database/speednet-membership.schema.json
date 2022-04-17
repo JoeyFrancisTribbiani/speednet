@@ -28,6 +28,34 @@
 			"bsonType": "int",
 			"description": "变化后的积分余额"
 		},
+		"remaining_minites": {
+			"bsonType": "int",
+			"title": "剩余分钟数",
+			"description": "剩余分钟数,暂时不用这个字段"
+		},
+		"total_minites": {
+			"bsonType": "int",
+			"title": "购买的总分钟数",
+			"description": "购买的总分钟数，减去 （当前时间 - 最后一次恢复的时间） > 0"
+		},
+		"is_pause": {
+			"bsonType": "int",
+			"title": "是否暂停计时"
+		},
+		"pause_date": {
+			"bsonType": "timestamp",
+			"description": "上一次暂停时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		},
+		"reverse_date": {
+			"bsonType": "timestamp",
+			"description": "上一次恢复时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		},
 		"comment": {
 			"bsonType": "string",
 			"description": "备注，说明积分新增、消费的缘由",
@@ -42,7 +70,10 @@
 		},
 		"start_time": {
 			"bsonType": "timestamp",
-			"description": "会员订阅开始时间"
+			"description": "会员订阅开始时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
 		},
 		"end_time": {
 			"bsonType": "timestamp",

@@ -24,6 +24,14 @@ const validator = {
     ],
     "label": "进程名（多个逗号隔开）"
   },
+  "ips": {
+    "rules": [
+      {
+        "format": "string"
+      }
+    ],
+    "label": "服务器IP（多个逗号隔开）"
+  },
   "picture": {
     "rules": [
       {

@@ -26,25 +26,25 @@
 					<text class="info-level">升级至尊会员享额外特权</text>
 				</view>
 			</view>
-			<unicloud-db ref="udb" v-slot:default="{data, loading, error, options}" collection="speednet-membership"
-				:where="`user_id=='${userInfo._id}'`" getone="true">
-				<view class="info-asset">
-					<view class="info-asset-item">
-						<text class="iai-title">状态</text>
-						<text class="iai-value" v-if="data.is_pause">暂停</text>
-						<text class="iai-value" v-else>生效</text>
-					</view>
-					<view class="info-asset-item">
-						<text class="iai-title">剩余时长</text>
-						<text class="iai-value">{{data.remaining_minites / 60 | timeFilter}}小时</text>
-					</view>
-					<view class="info-asset-item">
-						<text class="iai-title">订阅时间</text>
-						<text class="iai-value">{{data.start_time||'2022/3/24'}}</text>
-					</view>
+			<view class="info-asset">
+				<view class="info-asset-item">
+					<text class="iai-title">状态</text>
+					<text class="iai-value">{{my_is_pause}}</text>
 				</view>
-			</unicloud-db>
+				<view class="info-asset-item">
+					<text class="iai-title">剩余时长</text>
+					<text class="iai-value">{{my_remaining_minites}}</text>
+				</view>
+				<view class="info-asset-item">
+					<text class="iai-title">订阅时间</text>
+					<text class="iai-value">{{my_start_time}}</text>
+				</view>
+			</view>
 		</view>
+		<view class=" pause" hover-class="hover" @click="pause">
+			<text class="button-text">{{pauseBtn}}</text>
+		</view>
+
 
 		<view class="main-title">
 			<text>会员订阅</text>
@@ -79,7 +79,7 @@
 		<view class="main-title">
 			<text>会员特权</text>
 		</view>
-
+		<uni-sign-in ref="signIn"></uni-sign-in>
 		<view class="privilege">
 			<view class="privilege-item" v-for="(item, index) in privilegeList" :key="index" hover-class="hover"
 				@click="privilegeClick(index)">
@@ -88,7 +88,7 @@
 			</view>
 		</view>
 
-		<view class="level"v style="display: none;">
+		<view class="level" v style="display: none;">
 			<view class="level-rate">
 				<text class="level-rate-text1">当前返利比例</text>
 				<text class="level-rate-text2">25%</text>
@@ -131,6 +131,20 @@
 		filters: {
 			timeFilter(value) {
 				return parseFloat(value).toFixed(2)
+			},
+			shijianfilter: function(value) {
+				var dt = new Date(value)
+
+				var y = dt.getFullYear()
+				//这里month得加1
+				var m = dt.getMonth() + 1
+				var d = dt.getDate()
+
+				var hh = dt.getHours()
+				var mm = dt.getMinutes()
+				// var ss = dt.getSeconds();
+				// return `${y}-${m}-${d}:${hh}:${mm}`
+				return `${y}-${m}-${d}`
 			}
 		},
 		computed: {
@@ -140,6 +154,9 @@
 			})
 			// #ifdef APP-PLUS
 			,
+			remainTimes() {
+
+			},
 			appVersion() {
 				return getApp().appVersion
 			}
@@ -156,67 +173,48 @@
 				}
 			}
 		},
-		onLoad() {
-
-		},
+		onLoad() {},
 		onReady() {
 			db.collection("speednet-member-plan").get()
 				.then((res) => {
 					this.$data.rechargeOptions = res.result.data
 				})
-			console.log("this.rechargeOptions:" + userInfo)
+			this.getMembership()
 		},
 		data() {
 			return {
+				my_is_pause: '',
+				my_remaining_minites: '',
+				my_start_time: '',
+				pauseBtn: '',
 				statusBarHeight,
 				current: 0,
 				rechargeOptions: [],
-				// [
-				// 	{
-				// 		duration: '12个月',
-				// 		price: 88,
-				// 		des: [
-				// 			'到期自动续费',
-				// 			'可随时关闭'
-				// 		],
-				// 		showTag: true
-				// 	},
-
-				// 	{
-				// 		duration: '连续包年',
-				// 		price: 70,
-				// 		des: [
-				// 			'到期自动续费',
-				// 			'可随时关闭'
-				// 		],
-				// 		showTag: true
-				// 	}
-				// ],
 				privilegeList: [{
 						pic: '/static/coin.png',
 						text: '积分签到',
 						url: 'button'
 					},
 					{
-						pic: '/static/coin.png',
+						pic: '/static/birthday.png',
 						text: '个人资料',
 						url: '/pages/ucenter/userinfo/userinfo'
 					},
 					{
-							pic: '/static/coin.png',
-							text: '我的积分',
-							url: 'button'
-						},
+						pic: '/static/active.png',
+						text: '我的积分',
+						url: 'button'
+					},
 					{
-						pic: '/static/quan.png',
+						pic: '/static/notic.png',
 						text: '意见反馈',
 						url: '/uni_modules/uni-feedback/pages/opendb-feedback/opendb-feedback'
 					},
 
 					{
 						pic: '/static/goods.png',
-						text: '注销账号',
-						url: '/pages/ucenter/settings/deactivate/deactivate'
+						text: '应用设置',
+						url: '/pages/ucenter/settings/settings'
 					},
 					// {
 					// 	pic: '/static/red-bag.png',
@@ -251,7 +249,119 @@
 			}
 		},
 		methods: {
+			signIn() { //普通签到
+				this.$refs.signIn.open()
+			},
+			async reload() {
+				// location.reload()
+				// uni.redirectTo("/pages/speednet-member-plan/detail")
+				uni.reLaunch({
+					url: '/pages/speednet-membership/memberCenter'
+				})
 
+			},
+			async pause() {
+				if (this.my_is_pause == '生效') {
+					uni.sendNativeEvent("pause", '', function(e) {
+						this.configyaml = JSON.stringify(e)
+						uni.showToast({
+							title: JSON.stringify(e),
+							icon: 'error',
+						});
+						console.log("sendNativeEvent-----------回调" + JSON.stringify(e));
+					});
+				}
+
+
+				uni.showLoading({
+					mask: true
+				})
+				const membership = uniCloud.importObject('membership')
+				var result = await membership.pause(this.userInfo._id)
+				uni.hideLoading()
+				uni.showModal({
+					title: "提示",
+					content: result,
+					showCancel: false,
+					confirmText: "知道了",
+					complete: () => {
+						uni.reLaunch({
+							url: '/pages/speednet-membership/memberCenter'
+						})
+						// uni.redirectTo("pages/speednet-member-plan/detail")
+						// uni.navigateBack({
+						// 	delta: 0
+						// })
+					}
+				});
+			},
+			getHourMinite(minites) {
+				return Math.floor(minites / 60) + '小时' + (minites % 60) + '分'
+			},
+			async getMembership() {
+				const membership = uniCloud.importObject('membership')
+				var myship = await membership.getMembership(this.userInfo._id)
+				if (myship == "") {
+					this.my_remaining_minites = '0分钟'
+					this.my_is_pause = '暂停'
+					this.pauseBtn = '恢复计时'
+					this.my_start_time = '-'
+				} else {
+					this.my_is_pause = myship.is_pause ? '暂停' : '生效'
+					this.pauseBtn = myship.is_pause ? '恢复计时' : '暂停计时'
+					if (myship.is_pause) {
+						this.my_remaining_minites = this.getHourMinite(myship.remaining_minites)
+						this.my_start_time = this.shijianfilter(myship.start_time)
+					} else {
+						var now = new Date().getTime()
+						var reverse = Date.parse(myship.reverse_date)
+						var sub = now - reverse
+						var my_time = Math.floor(sub / (60 * 1000))
+						var remaining = myship.remaining_minites - my_time
+						this.my_start_time = this.shijianfilter(myship.start_time)
+						if (remaining <= 0) {
+							this.my_remaining_minites = '0分钟'
+						} else {
+							this.my_remaining_minites = this.getHourMinite(remaining)
+							let clock = window.setInterval(() => {
+								remaining--
+								this.my_remaining_minites = this.getHourMinite(remaining)
+							}, 60000)
+						}
+					}
+				}
+			},
+			/**
+			 * 获取积分信息
+			 */
+			getScore() {
+				if (!this.userInfo) return uni.showToast({
+					title: this.$t('mine.checkScore'),
+					icon: 'none'
+				});
+				uni.showLoading({
+					mask: true
+				})
+				console.log("fuck" + this.userInfo._id)
+				db.collection("uni-id-scores")
+					.where('"user_id" == $env.uid')
+					.field('score,balance')
+					.orderBy("create_date", "desc")
+					.limit(1)
+					.get()
+					.then((res) => {
+						console.log(res);
+						const data = res.result.data[0];
+						let msg = '';
+						msg = data ? (this.$t('mine.currentScore') + data.balance) : this.$t('mine.noScore');
+						uni.showToast({
+							title: msg,
+							icon: 'none'
+						});
+					}).finally(() => {
+						uni.hideLoading()
+					})
+			},
 			toUserInfo() {
 				uni.navigateTo({
 					url: '/pages/ucenter/userinfo/userinfo'
@@ -260,23 +370,58 @@
 			rechargeChange(index) {
 				this.current = index
 			},
-			updateNow() {
-				let subscribe = membership.subscribe("1", "33")
-				if (subscribe) {
-					uni.showToast({
-						icon: "none",
-						title: `选择了「${this.rechargeOptions[this.current].hours}小时」`
-					})
-				}
+			async updateNow() {
+				if (!this.userInfo) return uni.showToast({
+					title: '请先登录',
+					icon: 'none'
+				});
+
+				uni.showLoading({
+					mask: true
+				})
+				const membership = uniCloud.importObject('membership')
+				let subscribe = await membership.subscribe(this.userInfo._id, this.rechargeOptions[this.current].hours)
+				uni.hideLoading()
+				let msg = '';
+				msg = subscribe ? `成功订阅「${this.rechargeOptions[this.current].hours}小时」` : `订阅失败`;
+				uni.showModal({
+					title: "提示",
+					content: msg,
+					showCancel: false,
+					confirmText: "知道了",
+					complete: () => {
+						uni.reLaunch({
+							url: '/pages/speednet-membership/memberCenter'
+						})
+						// uni.redirectTo("pages/speednet-member-plan/detail")
+						// uni.navigateBack({
+						// 	delta: 0
+						// })
+					}
+				});
+				// }).finally(() => {
+
+				// })
+				// uni.navigateBack({
+				// 	delta: 0
+				// })
 			},
 			privilegeClick(index) {
 				uni.navigateTo({
 					url: this.privilegeList[index].url
 				})
-				uni.showToast({
-					icon: "none",
-					title: `点击了「${this.privilegeList[index].text}」`
-				})
+				// uni.showToast({
+				// 	icon: "none",
+				// 	title: `点击了「${this.privilegeList[index].text}」`
+				// })
+				switch (index) {
+					case 0:
+						this.signIn();
+						break;
+					case 2:
+						this.getScore();
+						break;
+				}
 			},
 			back() {
 				uni.navigateBack()
@@ -284,6 +429,20 @@
 					icon: "none",
 					title: "返回"
 				})
+			},
+			shijianfilter: function(value) {
+				var dt = new Date(value)
+
+				var y = dt.getFullYear()
+				//这里month得加1
+				var m = dt.getMonth() + 1
+				var d = dt.getDate()
+
+				var hh = dt.getHours()
+				var mm = dt.getMinutes()
+				// var ss = dt.getSeconds();
+				// return `${y}-${m}-${d}:${hh}:${mm}`
+				return `${y}-${m}-${d}`
 			}
 		}
 	}
@@ -430,7 +589,7 @@
 		}
 
 		&-value {
-			font-size: 35rpx;
+			font-size: 30rpx;
 			color: #FFFFFF;
 		}
 	}
@@ -517,6 +676,22 @@
 		&-text {
 			font-size: 30rpx;
 			color: #1C1C1C;
+		}
+	}
+
+	.pause {
+		margin: 35rpx 30rpx 20rpx 30rpx;
+		background-color: mediumseagreen;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		height: 85rpx;
+		border-radius: 50rpx;
+
+		&-text {
+			font-size: 30rpx;
+			// color: #1C1C1C;
 		}
 	}
 

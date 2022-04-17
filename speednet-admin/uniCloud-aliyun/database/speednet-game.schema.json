@@ -21,6 +21,11 @@
 			"title": "进程名（多个逗号隔开）",
 			"description": "进程名（可以是多个，逗号隔开）"
 		},
+		"ips": {
+			"bsonType": "string",
+			"title": "服务器IP（多个逗号隔开）",
+			"description": "服务器IP（可以是多个，逗号隔开）"
+		},
 		"picture": {
 			"bsonType": "file",
 			"fileMediaType": "image", // 可选值 all|image|video 默认值为all,表示所有文件，image表示图片类型文件，video表示视频类型文件

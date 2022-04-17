@@ -3,7 +3,7 @@
 			"path": "pages/list/list",
 			"style": {
 				// #ifndef APP-PLUS
-				"enablePullDownRefresh": true,
+				"enablePullDownRefresh": false,
 				// #endif
 				"navigationStyle": "custom"
 			}

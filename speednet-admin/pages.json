@@ -57,12 +57,12 @@
         "navigationBarTitleText": "列表"
     }
 }
-,{
-    "path": "pages/speednet-game/detail",
-    "style": {
-        "navigationBarTitleText": "详情"
-    }
-}
+// ,{
+//     "path": "pages/speednet-game/detail",
+//     "style": {
+//         "navigationBarTitleText": "详情"
+//     }
+// }
 ,{
     "path": "pages/speednet-game-region/add",
     "style": {

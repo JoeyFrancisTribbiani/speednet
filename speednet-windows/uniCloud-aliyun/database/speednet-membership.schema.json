@@ -1,0 +1,60 @@
+{
+	"bsonType": "object",
+	"required": ["user_id", "score", "balance", "start_time", "end_time"],
+	"permission": {
+		"read": true,
+		"create": "user_id == 622827847231600001948fc8",
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"user_id": {
+			"bsonType": "string",
+			"description": "用户id，参考uni-id-users表"
+		},
+		"score": {
+			"bsonType": "int",
+			"description": "本次变化的积分"
+		},
+		"type": {
+			"bsonType": "int",
+			"enum": [1, 2],
+			"description": "积分类型 1:收入 2:支出"
+		},
+		"balance": {
+			"bsonType": "int",
+			"description": "变化后的积分余额"
+		},
+		"remaining_minites": {
+			"bsonType": "int",
+			"title": "剩余分钟数"
+		},
+		"is_pause": {
+			"bsonType": "int",
+			"title": "是否暂停计时"
+		},
+		"comment": {
+			"bsonType": "string",
+			"description": "备注，说明积分新增、消费的缘由",
+			"trim": "both"
+		},
+		"create_date": {
+			"bsonType": "timestamp",
+			"description": "创建时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		},
+		"start_time": {
+			"bsonType": "timestamp",
+			"description": "会员订阅开始时间"
+		},
+		"end_time": {
+			"bsonType": "timestamp",
+			"description": "会员订阅结束时间"
+		}
+	}
+}

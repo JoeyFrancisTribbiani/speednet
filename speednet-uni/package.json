@@ -82,6 +82,5 @@
 		}
 	},
 	"dependencies": {
-		"vue-awesome-progress": "^1.9.7"
 	}
 }

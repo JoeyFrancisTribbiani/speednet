@@ -19,7 +19,7 @@
 				<view style="display: none;">
 					<uni-section>区服列表</uni-section>
 					<uni-collapse accordion>
-						<uni-collapse-item v-for="(region,index) in data.regions" title-border="none" :border="false">
+						<uni-collapse-item v-for="(region,index) in data.regions" title-border="none" :border="false" :key="index">
 							<template v-slot:title>
 								<uni-list>
 									<uni-list-item :title="region.text" :show-extra-icon="true"
@@ -33,7 +33,7 @@
 									:where="`region_id=='${region.value}'`">
 									<uni-list>
 										<uni-list-item :title="peer.peer_name" :show-extra-icon="true"
-											:extra-icon="peerIcon" v-for="(peer,ii) in data">{{peer.peer_name}}
+											:extra-icon="peerIcon" v-for="(peer,ii) in data" :key="ii">{{peer.peer_name}}
 										</uni-list-item>
 									</uni-list>
 								</unicloud-db>
@@ -43,19 +43,18 @@
 				</view>
 			</view>
 		</unicloud-db>
-		<view class="circle">
-			<vue-awesome-progress :circle-radius="120" :circle-width="4" :line-width="33" :font-size="35"
-				:point-radius="20" :percentage="progress" :duration="dur" :point-color="'#3B77E3'"
-				:font-color="'#3B77E3'" :use-gradient='true' />
-		</view>
-		<!-- 		  :format="formatPeople"
-		  easing="0,0,.35,.43" -->
+		<!-- <myprogress></myprogress> -->
 
 		<view class=".btns">
 			<button type="primary" @click="startSpeed">启动加速</button>
 		</view>
+<!-- 		<view class=".btns">
+			<button type="primary" @click="testanim">ceshi</button>
+		</view> -->
+		<p>{{this.configyaml}}</p>
 	</view>
 </template>
+
 
 <script>
 	// 由schema2code生成，包含校验规则和enum静态数据
@@ -65,35 +64,37 @@
 	import {
 		mapGetters
 	} from 'vuex';
-	import VueAwesomeProgress from "vue-awesome-progress"
-
+	// import myprogress from "@/components/myprogress/myprogress";
 
 	const db = uniCloud.database();
-
 	export default {
-		components: {
-			VueAwesomeProgress
-		},
-		data() {
-			return {
-				progress: 0,
+		data(){
+			return{
+				progress: 34,
 				dur: 0,
-				// peer_id:'',
-				// peer_name:'',
 				queryWhere: '',
 				options: {
 					// 将scheme enum 属性静态数据中的value转成text
 					...enumConverter
 				},
+				configyaml: '',
+				loading: true,
+				noData: false,
+				determinate: false,
+				offsetTop: 100,
 			}
 		},
+
 		onLoad(e) {
 			this.userId = this.userInfo()._id
 			console.log('userid getted:' + JSON.stringify(this.userId))
-			console.log('userid getted:' + this.userId)
+
 			this.gameName = e.name
+			this.processes = e.processes
 			this.peerId = e.peer_id
 			this.peerName = e.peer_name
+			console.log('gameName getted:' + this.gameName)
+			console.log('processes getted:' + this.processes)
 		},
 		onReady() {
 			if (this._id) {
@@ -108,6 +109,13 @@
 			...mapGetters({
 				userInfo: 'user/info'
 			}),
+			testanim() {
+				if (this.loading) {
+					this.loading = false
+				} else {
+					this.loading = true
+				}
+			},
 			async startSpeed() {
 				this.dur = 5
 				this.progress = 20
@@ -144,15 +152,19 @@
 						this.progress = 0;
 					} else {
 						let res = await db.collection("speednet-peer").where('_id=="' + this.peerId + '"').get()
+						var event = res.result.data
+						event[0].processes = this.processes
+						event[0].remaining=membership.remaining_minites
 
-						var Context = plus.android.importClass("android.content.Context");
-						var InputMethodManager = plus.android.importClass(
-							"android.view.inputmethod.InputMethodManager");
-						var main = plus.android.runtimeMainActivity();
-						var imm = main.getSystemService(Context.INPUT_METHOD_SERVICE);
-						imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
-						
-						
+						uni.sendNativeEvent("startSpeed", event, function(e) {
+							this.configyaml =JSON.stringify(e)
+							uni.showToast({
+								title: JSON.stringify(e),
+								icon: 'error',
+							});
+							console.log("sendNativeEvent-----------回调" + JSON.stringify(e));
+						});
+
 						this.progress = 90;
 						console.log(res.result)
 					}

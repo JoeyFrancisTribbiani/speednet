@@ -12,9 +12,10 @@
 		</view>
 
 		<unicloud-db ref='udb' v-slot:default="{data,pagination,hasMore, loading, error, options}" @error="onqueryerror"
-			:collection="'speednet-game'" :page-size="6">
+			:collection="'speednet-game'" :orderby="'create_date desc'" :page-size="10">
 			<!-- 基于 uni-list 的页面布局 field="user_id.username"-->
 			<uni-list class="uni-list" :border="false" :style="{height:listHight}">
+
 				<!-- 作用于app端nvue页面的下拉加载 -->
 				<!-- #ifdef APP-NVUE -->
 				<refreshBox @refresh="refresh" :loading="loading"></refreshBox>
@@ -22,8 +23,7 @@
 
 				<!-- 列表渲染 -->
 				<uni-list-item :to="'/pages/speednet-game/detail?id='+item._id" v-for="(item,index) in data"
-					:key="index" :clickable="true" :direction="'row'" :rightText="'一键加速'"  
-					:showArrow="'true'" >
+					:key="index" :rightText="'一键加速'" :showArrow="'true'">
 					<!-- 通过header插槽定义列表左侧图片 -->
 					<template v-slot:header>
 						<view class="imgc"></view>
@@ -78,16 +78,16 @@
 					return '请输入搜索内容'
 				}
 			},
+			colList() {
+				return db.collection('speednet-game').where('"status" == 1').get();				
+			}
 			// colList() {
-			// 	return db.collection('opendb-news-articles').get()
-				
-			// 	// return [
-			// 	// 	db.collection('opendb-news-articles').where(this.where).field(
-			// 	// 		'avatar,title,last_modify_date,user_id').getTemp(),
-			// 	// 	db.collection('uni-id-users').field('_id,username').getTemp()
-			// 	// ]
+			// 	return [
+			// 		db.collection('opendb-news-articles').where(this.where).field(
+			// 			'avatar,title,last_modify_date,user_id').getTemp(),
+			// 		db.collection('uni-id-users').field('_id,username').getTemp()
+			// 	]
 			// }
-			
 		},
 		data() {
 			return {
@@ -203,24 +203,18 @@
 	}
 
 	.avatar {
-		height: 50px;
-		padding-right: 0rpx;
-		width: 100px;
-		margin-right: 20rpx;
-		border-radius: 8px;
-		-webkit-filter: drop-shadow(0px 0px 20px #000);
-		filter: drop-shadow(0px 0px 20px #000);
+		width: 200rpx;
+		height: 200rpx;
+		margin-right: 10rpx;
 	}
 
 	.main {
 		justify-content: space-between;
-		padding-top:20px;
-		padding-bottom:20px;
 	}
 
 	.title {
-		width: 380rpx;
-		font-size: 28rpx;
+		width: 480rpx;
+		font-size: 32rpx;
 	}
 
 	.info {
@@ -240,7 +234,6 @@
 		height: 50px;
 		top: 0;
 		left: 0;
-		margin-bottom: 10px;
 		/* #ifndef APP-PLUS */
 		z-index: 9;
 		/* #endif */
