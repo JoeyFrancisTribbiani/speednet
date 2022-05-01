@@ -496,16 +496,16 @@ async function getDeviceInfo() {
 		}),
 		idfa = plus.storage.getItem('idfa') || '', //idfa有需要的用户在应用首次启动时自己获取存储到storage中
 		vendor = plus.device.vendor;
-	try {
-		deviceInfo.push_clientid = plus.push.getClientInfo().clientid
-	} catch (e) {
-		uni.showModal({
-			content: '获取推送标识失败。如果你的应用不需要推送功能，请注释掉本代码块',
-			showCancel: false,
-			confirmText: "好的"
-		});
-		console.log(e)
-	}
+	// try {
+	// 	deviceInfo.push_clientid = plus.push.getClientInfo().clientid
+	// } catch (e) {
+	// 	uni.showModal({
+	// 		content: '获取推送标识失败。如果你的应用不需要推送功能，请注释掉本代码块',
+	// 		showCancel: false,
+	// 		confirmText: "好的"
+	// 	});
+	// 	console.log(e)
+	// }
 	Object.assign(deviceInfo, {
 		imei,
 		uuid,

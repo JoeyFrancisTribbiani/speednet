@@ -184,6 +184,7 @@
 		data() {
 			return {
 				my_is_pause: '',
+				tabClick: false, // true 表示是两次点击中的第一次点了 tabBar
 				my_remaining_minites: '',
 				my_start_time: '',
 				pauseBtn: '',
@@ -249,6 +250,21 @@
 			}
 		},
 		methods: {
+			onTabItemTap(e) {
+				// tab 点击时执行，此处直接接收单击事件
+				console.log(e)
+				if (this.tabClick) { // 200ms 内再次点击
+					// 这里就是模拟的双击事件，可以写类似数据刷新相关处理
+					uni.reLaunch({
+						url: '/pages/speednet-membership/memberCenter'
+					})
+				}
+				this.tabClick = true
+				setTimeout(() => {
+					this.tabClick = false // 200ms 内没有第二次点击，就当作单击
+				}, 200)
+
+			},
 			signIn() { //普通签到
 				this.$refs.signIn.open()
 			},

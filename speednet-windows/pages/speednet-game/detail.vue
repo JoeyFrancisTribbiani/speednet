@@ -2,7 +2,7 @@
 	<view class="container">
 		<unicloud-db ref="udb" v-slot:default="{data, loading, error, options}" :options="options"
 			collection="speednet-game,speednet-game-region"
-			field="game_name,picture,regions{region_name as text,_id as value},platform" :where="queryWhere"
+			field="game_name,picture,regions{region_name as text,_id as value},platform,processes" :where="queryWhere"
 			:getone="true" :manual="true">
 			<view v-if="error">{{error.message}}</view>
 			<view v-else-if="loading">
@@ -34,9 +34,10 @@
 									collection="speednet-peer" field="_id,peer_name"
 									:where="`region_id=='${region.value}'`">
 									<uni-list>
-										<uni-list-item :to="'/pages/speednet-myspeed/detail?id='+gameId+'&name='+options.game_name+'&peer_id='+peer._id +'&peer_name='+peer.peer_name" :title="peer.peer_name"
-											:show-extra-icon="true" :extra-icon="peerIcon" v-for="(peer,ii) in data"
-											:key="ii">{{peer.peer_name}}</uni-list-item>
+										<uni-list-item
+											:to="'/pages/speednet-myspeed/detail?id='+gameId+'&name='+options.game_name+'&peer_id='+peer._id +'&peer_name='+peer.peer_name+'&processes='+options.processes+'&picurl='+options.picture.url"
+											:title="peer.peer_name" :show-extra-icon="true" :extra-icon="peerIcon"
+											v-for="(peer,ii) in data" :key="ii">{{peer.peer_name}}</uni-list-item>
 									</uni-list>
 								</unicloud-db>
 							</view>

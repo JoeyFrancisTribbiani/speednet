@@ -1,110 +1,127 @@
 <template>
-	<view class="warp">
-		<!-- #ifdef APP-PLUS -->
-		<status-bar />
+	<view class="pages">
+		<!-- #ifndef H5 -->
+		<statusBar></statusBar>
 		<!-- #endif -->
-
 		<!-- 搜索功能 -->
 		<view class="uni-search-box">
 			<uni-search-bar v-model="keyword" ref="searchBar" radius="100" cancelButton="none" disabled
-				:placeholder="inputPlaceholder" :bgColor="'#3f3f3f'"/>
+				:placeholder="inputPlaceholder" />
 			<view class="cover-search-bar" @click="searchClick"></view>
 		</view>
-		<!-- banner -->
-		<!-- 		<unicloud-db ref="bannerdb" v-slot:default="{data, loading, error, options}" collection="opendb-banner"
-			field="_id,bannerfile,open_url,title" @load="onqueryload">
-			<!-- 当无banner数据时显示占位图 -->
-		<!-- 			<image v-if="!(loading||data.length)" class="banner-image" src="/static/grid/empty.png" mode="aspectFill"
-				:draggable="false" />
-			<uni-swiper-dot v-else class="uni-swiper-dot-box" @clickItem="clickItem" :info="data" :current="current"
-				field="content">
-				<swiper class="swiper-box" @change="changeSwiper" :current="swiperDotIndex">
-					<swiper-item v-for="(item, index) in data" :key="item._id">
-						<view class="swiper-item" @click="clickBannerItem(item)">
-							<image class="banner-image" :src="item.bannerfile.url" mode="aspectFill"
-								:draggable="false" />
+		<uni-list class="uni-list" :border="false" :style="{height:listHight}">
+			<uni-list-item class="game-item" :to="'/pages/speednet-game/detail?id='+item.gameId"
+				v-for="(item,index) in this.mySpeedList" :key="index">
+				<!-- 通过header插槽定义列表左侧图片 -->
+				<template v-slot:header>
+					<view class="avatar">
+						<image class="myimage" :src="item.picurl" mode="widthFix"></image>
+					</view>
+				</template>
+				<!-- 通过body插槽定义布局 -->
+				<template v-slot:body class="slot-box">
+					<view class="main">
+						<text class="title">{{item.game}}</text>
+						<view class="info">
+							<!-- <text class="author">{{item.user_id[0]?item.user_id[0].username:''}}</text> -->
+							<uni-dateformat class="last_modify_date" :date="item.start_date" format="yyyy-MM-dd"
+								:threshold="[60000, 2592000000]" />
 						</view>
-					</swiper-item>
-				</swiper>
-			</uni-swiper-dot>
-		</unicloud-db>
-
- -->
-		<!-- 宫格 -->
-		<uni-section :title="'游戏库'" style="margin: 0;background-color: #04498C;" type="line"></uni-section>
-		<unicloud-db ref='udb' v-slot:default="{data,pagination,hasMore, loading, error, options}" @error="onqueryerror"
-			:collection="'speednet-game'" :page-size="10">
-			<!-- 		<unicloud-db ref='udb' v-slot:default="{data,pagination,hasMore, loading, error, options}" @error="onqueryerror"
-			:collection="colList" :page-size="10">	 -->
-			<view class="example-body">
-				<uni-grid :column="4" style="width: 800px;" :highlight="true" :showBorder="false" :square="false" @change="change">
-					<template v-for="(item,i) in data" class="fuck">
-						<view class="uni-flex uni-column">
-							<uni-grid-item :index="i" :key="i" >
-								<view class="grid-item-box"  >
-									<image :src=item.picture.url style="width: 120px; height: 160px;" class="image" />
-									<text class="text">{{item.game_name}}</text>
-								</view>
-							</uni-grid-item>
-						</view>
-					</template>
-				</uni-grid>
-			</view>
-		</unicloud-db>
+					</view>
+				</template>
+				<template v-slot:footer>
+					<view class="speedBtnWrapper">
+						<button class="rightBtn">加速</button>
+					</view>
+				</template>
+			</uni-list-item>
+		</uni-list>
 	</view>
 </template>
 
 <script>
 	import {
 		mapGetters,
+		mapMutations
 	} from 'vuex';
+	var cdbRef, currentWebview;
 	import statusBar from "@/uni_modules/uni-nav-bar/components/uni-nav-bar/uni-status-bar";
+
 	const db = uniCloud.database();
+
 	export default {
-		components: {
-			statusBar
-		},
-		data() {
-			return {
-				gridList: [],
-				where: '"status" == 1',
-				keyword: "",
-				showRefresh: false,
-				listHight: 0,
-				current: 0,
-				swiperDotIndex: 0
-			}
-		},
 		computed: {
 			...mapGetters({
-				hasLogin: 'user/hasLogin'
+				speedInfo: 'user/speedInfo',
 			}),
+			hasStarted() {
+				if (this.speedInfo && this.speedInfo.hasStarted) {
+					return this.speedInfo.hasStarted
+				} else {
+					return false
+				}
+			},
+			appVersion() {
+				return getApp().appVersion
+			},
+			appConfig() {
+				return getApp().globalData.config
+			},
+			avatar_file() {
+				if (this.userInfo.avatar_file && this.userInfo.avatar_file.url) {
+					return this.userInfo.avatar_file
+				} else {
+					return "/static/avatar.png"
+				}
+			},
 			inputPlaceholder(e) {
 				if (uni.getStorageSync('CURRENT_LANG') == "en") {
 					return 'Please enter the search content'
 				} else {
-					return '输入要搜索的游戏'
+					return '请输入搜索内容'
 				}
 			},
 			colList() {
-				return db.collection('speednet-game')
-				// .where(this.where).getTemp(),
-				//db.collection('uni-id-users').field('_id,username').getTemp()
-
+				return db.collection('speednet-game').where('"status" == 1').get();
+			},
+			mySpeedList: {
+				get() {
+					console.log('this.speedInfo', this.speedInfo);
+					console.log('tthis.speedInfo.mySpeedList', this.speedInfo.mySpeedList);
+					if (this.speedInfo && this.speedInfo.mySpeedList) {
+						return this.speedInfo.mySpeedList
+					} else {
+						return []
+					}
+				},
+				set(newVal) {}
+			},
+		},
+		components: {
+			statusBar
+		},
+		onTabItemTap(e) {
+			console.log('-------------------------onTabItemTap')
+			if (this.speedInfo.hasStarted) {
+				var running = this.speedInfo.runningGame
+				console.log(JSON.stringify(running))
+				uni.navigateTo({
+					url: '/pages/speednet-myspeed/detail?id=' + running.gameId + '&name=' + running
+						.gameName +
+						'&peer_id=' + running.peerId + '&peer_name=' + running.peerName +
+						'&processes=' +
+						running.processes + '&picurl=' + running.picurl
+				})
 			}
 		},
-		onLoad() {
-			// let gridList = []
-			// for (var i = 0; i < 3; i++) {
-			// 	gridList.push(this.$t('grid.visibleToAll'))
-			// }
-			// for (var i = 0; i < 3; i++) {
-			// 	gridList.push(this.$t('grid.invisibleToTourists'))
-			// }
-			// for (var i = 0; i < 3; i++) {
-			// 	gridList.push(this.$t('grid.adminVisible'))
-			// }
-			// this.gridList = gridList
+		data() {
+			return {
+				where: '"article_status" == 1',
+				keyword: "",
+				showRefresh: false,
+				listHight: 0,
+				tabClick: false // true 表示是两次点击中的第一次点了 tabBar
+			}
 		},
 		watch: {
 			keyword(keyword, oldValue) {
@@ -116,7 +133,76 @@
 				}
 			}
 		},
+		onLoad(e) {
+			let currentRoute = this.$mp.page.route; // 获取当前页面路由
+			if (this.speedInfo.hasStarted) {
+				var running = this.speedInfo.runningGame
+				console.log(JSON.stringify(running))
+				uni.navigateTo({
+					url: '/pages/speednet-myspeed/detail?id=' + running.gameId + '&name=' + running
+						.gameName +
+						'&peer_id=' + running.peerId + '&peer_name=' + running.peerName +
+						'&processes=' +
+						running.processes + '&picurl=' + running.picurl
+				})
+			}
+		},
+		onShow() {
+			console.log('onshow.speedInfo', this.speedInfo.hasStarted);
+			if (this.speedInfo.hasStarted) {
+				var running = this.speedInfo.runningGame
+				console.log(JSON.stringify(running))
+				uni.navigateTo({
+					url: '/pages/speednet-myspeed/detail?id=' + running.gameId + '&name=' + running
+						.gameName +
+						'&peer_id=' + running.peerId + '&peer_name=' + running.peerName + '&processes=' +
+						running.processes + '&picurl=' + running.picurl
+				})
+			} else {
+
+			}
+		},
+		onBackPress() {
+			console.log('onBackPress.speedInfo', this.speedInfo.hasStarted);
+			if (this.speedInfo.hasStarted) {
+				var running = this.speedInfo.runningGame
+				console.log(JSON.stringify(running))
+				uni.navigateTo({
+					url: '/pages/speednet-myspeed/detail?id=' + running.gameId + '&name=' + running
+						.gameName +
+						'&peer_id=' + running.peerId + '&peer_name=' + running.peerName + '&processes=' +
+						running.processes + '&picurl=' + running.picurl
+				})
+			} else {
+
+			}
+		},
+		async onReady() {
+			// #ifdef APP-NVUE
+			/* 可用窗口高度 - 搜索框高 - 状态栏高 */
+			this.listHight = uni.getSystemInfoSync().windowHeight - uni.getSystemInfoSync().statusBarHeight -
+				50 +
+				'px';
+			// #endif
+			// #ifndef APP-NVUE
+			this.listHight = 'auto'
+			// #endif
+			cdbRef = this.$refs.udb
+		},
+		async onShow() {
+			this.keyword = getApp().globalData.searchText
+			getApp().globalData.searchText = ''
+		},
 		methods: {
+			mySpeedList() {
+				console.log('this.speedInfo', this.speedInfo);
+				console.log('tthis.speedInfo.mySpeedList', this.speedInfo.mySpeedList);
+				if (this.speedInfo && this.speedInfo.mySpeedList) {
+					return this.speedInfo.mySpeedList
+				} else {
+					return []
+				}
+			},
 			searchClick(e) { //点击搜索框
 				uni.hideKeyboard();
 				uni.navigateTo({
@@ -124,158 +210,132 @@
 					animationType: 'fade-in'
 				});
 			},
-			change(e) {
-				uni.showToast({
-					title: this.$t('grid.clickTip') + " " + `${e.detail.index}` + " " + this.$t(
-						'grid.clickTipGrid'),
-					icon: 'none'
+			retry() {
+				this.refresh()
+			},
+			refresh() {
+				cdbRef.loadData({
+					clear: true
+				}, () => {
+					uni.stopPullDownRefresh()
+					// #ifdef APP-NVUE
+					this.showRefresh = false
+					// #endif
+					console.log('end');
 				})
+				console.log('refresh');
 			},
-			/**
-			 * banner加载后触发的回调
-			 */
-			onqueryload(data) {},
-			changeSwiper(e) {
-				this.current = e.detail.current
+			loadMore() {
+				cdbRef.loadMore()
 			},
-			clickItem(e) {
-				this.swiperDotIndex = e
+			onqueryerror(e) {
+				console.error(e);
 			},
-			/**
-			 * 点击banner的处理
-			 */
-			clickBannerItem(item) {
-				// 有外部链接-跳转url
-				if (item.open_url) {
-					uni.navigateTo({
-						url: '/pages/common/webview/webview?url=' + item.open_url + '&title=' + item.title,
-						success: res => {},
-						fail: () => {},
-						complete: () => {}
-					});
+			onpullingdown(e) {
+				console.log(e);
+				this.showRefresh = true
+				if (e.pullingDistance > 100) {
+					this.refresh()
 				}
-				// 其余业务处理
 			}
+		},
+		// #ifndef APP-NVUE
+		onPullDownRefresh() {
+			this.refresh()
+		},
+		onReachBottom() {
+			this.loadMore()
 		}
+		// #endif
 	}
 </script>
 
-<style>
-	image {
-		border-radius: 8px;
-		-webkit-filter: drop-shadow(0px 0px 20px #000);
-		filter: drop-shadow(0px 0px 20px #000);
-	}
-	. fuck{
-		width:550px;
+<style scoped>
+	.speedBtnWrapper {
+		width: 80px;
+		height: 60px;
+		text-align: center;
+		padding-right: 8px;
+		margin-left: -20px;
 	}
 
-	/* #ifndef APP-NVUE */
-	page {
-		display: flex;
-		flex-direction: column;
-		box-sizing: border-box;
-		background-color: #3F3F3F;
-		min-height: 100%;
-		height: auto;
+	.rightBtn {
+		font-size: 14px;
+		width: 60px;
+		margin: 0 auto;
+		margin-top: 15px;
+		display: inline-block;
 	}
 
 	view {
-		font-size: 14px;
-		line-height: inherit;
-		background-color: #3F3F3F;
-	}
-
-	.example-body {
-		/* #ifndef APP-NVUE */
 		display: flex;
-		/* #endif */
-		flex-direction: row;
-		flex-wrap: wrap;
-		justify-content: center;
-		/* padding: 50; */
-		font-size: 14px;
-	}
-
-	/* #endif */
-
-	/* #ifdef APP-NVUE */
-	.warp {
-		background-color: #3F3F3F;
-	}
-
-	/* #endif */
-
-	.example-body {
+		box-sizing: border-box;
 		flex-direction: column;
-		padding: 50px;
-		background-color: #3F3F3F;
 	}
 
-	.text {
-		text-align: center;
-		font-size: 12rpx;
-		margin-top: 5rpx;
-		color: #ffffff;
+
+	.game-item {
+		border-bottom: 1px solid #4169E1;
 	}
 
-	.example-body {
-		/* #ifndef APP-NVUE */
-		display: block;
-		/* #endif */
+	.pages {
+		background-color: #FFF;
 	}
 
-	.grid-item-box {
-		flex: 1;
-		/* #ifndef APP-NVUE */
-		display: flex;
-		/* #endif */
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		padding: 10px;
-		margin: 0;
-		background-color: #3F3F3F;
+	.avatar {
+		width: 60px;
+		height: 60px;
+		margin-right: 10px;
+
 	}
 
-	.banner-image {
-		width: 750rpx;
-		height: 400rpx;
+	.myimage {
+		width: 60px;
+		height: 60px;
+		border-radius: 8px;
 	}
 
-	.swiper-box {
-		height: 400rpx;
+	.main {
+		justify-content: space-between;
 	}
 
-	.search-icons {
-		padding: 16rpx;
+	.title {
+		width: 480rpx;
+		font-size: 32rpx;
 	}
 
-	.search-container-bar {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		/* #endif */
+	.info {
 		flex-direction: row;
-		justify-content: center;
-		align-items: center;
-		position: fixed;
-		left: 0;
-		right: 0;
-		z-index: 10;
-		background-color: #fff;
+		justify-content: space-between;
 	}
 
-	/* #ifndef APP-NVUE || VUE3*/
-	/deep/
-	/* #endif */
-	.uni-searchbar__box {
-		border-width: 0;
-	}
-
-	/* #ifndef APP-NVUE || VUE3 */
-	/deep/
-	/* #endif */
-	.uni-input-placeholder {
+	.author,
+	.last_modify_date {
 		font-size: 28rpx;
+		color: #999999;
+	}
+
+	.uni-search-box {
+		background-color: #FFFFFF;
+		position: sticky;
+		height: 50px;
+		top: 0;
+		left: 0;
+		/* #ifndef APP-PLUS */
+		z-index: 9;
+		/* #endif */
+		/* #ifdef MP-WEIXIN */
+		width: 580rpx;
+		/* #endif */
+	}
+
+	.cover-search-bar {
+		height: 50px;
+		position: relative;
+		top: -50px;
+		margin-bottom: -50px;
+		/* #ifndef APP-NVUE */
+		z-index: 999;
+		/* #endif */
 	}
 </style>

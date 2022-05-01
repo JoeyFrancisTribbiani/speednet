@@ -34,9 +34,10 @@
 									collection="speednet-peer" field="_id,peer_name"
 									:where="`region_id=='${region.value}'`">
 									<uni-list>
-										<uni-list-item :to="'/pages/speednet-myspeed/detail?id='+gameId+'&name='+options.game_name+'&peer_id='+peer._id +'&peer_name='+peer.peer_name+'&processes='+options.processes" :title="peer.peer_name"
-											:show-extra-icon="true" :extra-icon="peerIcon" v-for="(peer,ii) in data"
-											:key="ii">{{peer.peer_name}}</uni-list-item>
+										<uni-list-item
+											:to="'/pages/speednet-myspeed/detail?id='+gameId+'&name='+options.game_name+'&peer_id='+peer._id +'&peer_name='+peer.peer_name+'&processes='+options.processes+'&picurl='+options.picture.url"
+											:title="peer.peer_name" :show-extra-icon="true" :extra-icon="peerIcon"
+											v-for="(peer,ii) in data" :key="ii">{{peer.peer_name}}</uni-list-item>
 									</uni-list>
 								</unicloud-db>
 							</view>

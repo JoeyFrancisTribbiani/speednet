@@ -11,3 +11,6 @@ db.collection('speednet-game').where('"status" == 1').get();
 db.collection('uni-id-users').get();
 db.collection('speednet-membership').remove();
 db.collection('speednet-membership').get()
+db.collection("speednet-membership").doc('625c293d5a5bf00001495bef').update({
+	remaining_minites: 2,
+})

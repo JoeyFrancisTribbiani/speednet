@@ -55,4 +55,7 @@
 
 <style>
 	/*每个页面公共css */
+/* 	page {
+		background-color: #002;
+	} */
 </style>

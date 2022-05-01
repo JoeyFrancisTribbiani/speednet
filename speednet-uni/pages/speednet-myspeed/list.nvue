@@ -21,13 +21,14 @@
 				<!-- #endif -->
 
 				<!-- 列表渲染 -->
-				<uni-list-item :to="'/pages/speednet-myspeed/detail?id='+item._id+'&name='+item.game_name+'&process='+item.process" v-for="(item,index) in data"
-					:key="index" :clickable="true" :direction="'row'" :rightText="'一键加速'"  
-					:showArrow="'true'" >
+				<uni-list-item
+					:to="'/pages/speednet-myspeed/detail?id='+item._id+'&name='+item.game_name+'&process='+item.process"
+					v-for="(item,index) in data" :key="index" :clickable="true" :direction="'row'" :rightText="'一键加速'"
+					:showArrow="'true'">
 					<!-- 通过header插槽定义列表左侧图片 -->
 					<template v-slot:header>
 						<view class="imgc"></view>
-						<image class="avatar"  :src="item.picture.url" mode="widthFix"></image>
+						<image class="avatar" :src="item.picture.url" mode="widthFix"></image>
 					</template>
 					<!-- 通过body插槽定义布局 -->
 					<template v-slot:body class="slot-box">
@@ -35,8 +36,8 @@
 							<text class="title">{{item.game_name}}</text>
 							<view class="info">
 								<!-- <text class="author">{{item.user_id[0]?item.user_id[0].username:''}}</text> -->
-								<uni-dateformat class="last_modify_date" :date="item.create_date"
-									format="yyyy-MM-dd" :threshold="[60000, 2592000000]" />
+								<uni-dateformat class="last_modify_date" :date="item.create_date" format="yyyy-MM-dd"
+									:threshold="[60000, 2592000000]" />
 							</view>
 						</view>
 					</template>
@@ -80,14 +81,14 @@
 			},
 			// colList() {
 			// 	return db.collection('opendb-news-articles').get()
-				
+
 			// 	// return [
 			// 	// 	db.collection('opendb-news-articles').where(this.where).field(
 			// 	// 		'avatar,title,last_modify_date,user_id').getTemp(),
 			// 	// 	db.collection('uni-id-users').field('_id,username').getTemp()
 			// 	// ]
 			// }
-			
+
 		},
 		data() {
 			return {
@@ -128,10 +129,10 @@
 			// });
 			//默认h5端不获取定位
 			// #ifndef H5
-			let location = await gps.getLocation({
-				geocode: true
-			})
-			console.log(location);
+			// let location = await gps.getLocation({
+			// 	geocode: true
+			// })
+			// console.log(location);
 			// #endif
 			// if(location){
 			// 	uni.showToast({
@@ -214,8 +215,8 @@
 
 	.main {
 		justify-content: space-between;
-		padding-top:20px;
-		padding-bottom:20px;
+		padding-top: 20px;
+		padding-bottom: 20px;
 	}
 
 	.title {

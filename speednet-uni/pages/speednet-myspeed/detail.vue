@@ -1,54 +1,78 @@
 <template>
 	<view class="container">
-		<unicloud-db ref="udb" v-slot:default="{data, loading, error, options}" :options="options"
-			collection="speednet-game,speednet-game-region"
-			field="game_name,picture,regions{region_name as text,_id as value},platform" :where="queryWhere"
-			:getone="true" :manual="true">
-			<view v-if="error">{{error.message}}</view>
-			<view v-else-if="loading">
-				<uni-load-more :contentText="loadMore" status="loading"></uni-load-more>
-			</view>
-			<view v-else-if="data">
-				<view>
-					<uni-file-picker v-if="data.picture && data.picture.fileType == 'image'" :value="data.picture"
-						:file-mediatype="data.picture && data.picture.fileType" return-type="object" readonly>
-					</uni-file-picker>
-					<uni-link v-else-if="data.picture" :href="data.picture.url" :text="data.picture.url"></uni-link>
-					<text v-else></text>
-				</view>
-				<view style="display: none;">
-					<uni-section>区服列表</uni-section>
-					<uni-collapse accordion>
-						<uni-collapse-item v-for="(region,index) in data.regions" title-border="none" :border="false" :key="index">
-							<template v-slot:title>
-								<uni-list>
-									<uni-list-item :title="region.text" :show-extra-icon="true"
-										:extra-icon="regionIcon">
-									</uni-list-item>
-								</uni-list>
-							</template>
-							<view class="content">
-								<unicloud-db ref="udb" v-slot:default="{data, loading, error, options}" :options="data"
-									collection="speednet-peer" field="_id,peer_name"
-									:where="`region_id=='${region.value}'`">
-									<uni-list>
-										<uni-list-item :title="peer.peer_name" :show-extra-icon="true"
-											:extra-icon="peerIcon" v-for="(peer,ii) in data" :key="ii">{{peer.peer_name}}
-										</uni-list-item>
-									</uni-list>
-								</unicloud-db>
-							</view>
-						</uni-collapse-item>
-					</uni-collapse>
-				</view>
-			</view>
-		</unicloud-db>
-		<!-- <myprogress></myprogress> -->
+		<!-- 		<view class="circle-wrapper">
+			<vue-awesome-progress :circle-radius="63" :circle-width="4" :line-width="4" :font-size="24"
+				:point-radius="6" :percentage="progress" :duration="duration" :format="formatPeople" />
+		</view> -->
 
-		<view class=".btns">
-			<button type="primary" @click="startSpeed">启动加速</button>
+		<view class="circle-wrapper">
+			<div class="sm-sm-loading-css" ref="sm_sm_loading" :style="smSmStyleObject">
+				<text ref="loading_text" :style="smTextStyleObject">{{this.progress}}</text>
+			</div>
+			<div ref="md_loading" class="md-loading-css"></div>
+			<div ref="sm_loading" :class="smLoadingCssObject"></div>
+			<div ref="loading" :class="loadingCssObject"></div>
 		</view>
-<!-- 		<view class=".btns">
+		<!-- 		<view class="btns">
+			<button type="primary" @click="startSpeed">启动加速</button>
+		</view> -->
+		<view class="btns" hover-class="hover" @click="startSpeed">
+			<text class="button-text">{{speedBtn}}</text>
+		</view>
+
+		<uni-row class="b-title-row">
+			<uni-col :span="8" class="data-col">
+				<view class=" b-col">
+					<uni-icons type="map-pin-ellipse"></uni-icons>
+					<text class="b-title">网络延迟</text>
+				</view>
+			</uni-col>
+			<uni-col :span="8" class="data-col">
+				<view class=" b-col">
+					<uni-icons type="map-pin-ellipse"></uni-icons>
+					<text class="b-title">综合提速</text>
+				</view>
+			</uni-col>
+			<uni-col :span="8" class="data-col">
+				<view class=" b-col">
+					<uni-icons type="map-pin-ellipse"></uni-icons>
+					<text class="b-title">丢包率</text>
+				</view>
+			</uni-col>
+		</uni-row>
+		<uni-row class="b-data-row">
+			<uni-col class="data-col" :span="7" :push="1">
+				<view class=" b-col">
+					<p class="number">{{net_delay}}</p>
+					<p class="b-title">ms</p>
+				</view>
+			</uni-col>
+			<uni-col class="data-col" :span="1" :push="1">
+				<view class=" b-col">
+					<p class="number">|</p>
+					<p class="b-title">|</p>
+				</view>
+			</uni-col>
+			<uni-col class="data-col" :span="7" :push="1">
+				<view class=" b-col">
+					<p class="number">{{faster}}</p>
+					<p class="b-title">%</p>
+				</view>
+			</uni-col>
+			<uni-col class="data-col" :span="1" :push="1">
+				<view class=" b-col">
+					<p class="number">|</p>
+					<p class="b-title">|</p>
+				</view>
+			</uni-col>
+			<uni-col class="data-col" :span="7" :push="1">
+				<view class=" b-col">
+					<p class="number">{{loss}}</p>
+					<p class="b-title">%</p>
+				</view>
+			</uni-col>
+		</uni-row>
+		<!-- 		<view class=".btns">
 			<button type="primary" @click="testanim">ceshi</button>
 		</view> -->
 		<p>{{this.configyaml}}</p>
@@ -61,17 +85,29 @@
 	import {
 		enumConverter
 	} from '../../js_sdk/validator/speednet-game.js';
+	import store from '@/store'
 	import {
-		mapGetters
+		mapGetters,
+		mapMutations
 	} from 'vuex';
-	// import myprogress from "@/components/myprogress/myprogress";
-
+	import VueAwesomeProgress from '@/static/vue-awesome-progress.js'
 	const db = uniCloud.database();
+
 	export default {
-		data(){
-			return{
-				progress: 34,
-				dur: 0,
+		data() {
+			return {
+				peerIcon: {
+					color: '#4cd964',
+					size: '22',
+					type: 'map-pin-ellipse'
+				},
+				speedBtn: '启动加速',
+				sm_anim: '',
+				net_delay: 22,
+				faster: 83,
+				loss: 2,
+				progress: '',
+				duration: 3,
 				queryWhere: '',
 				options: {
 					// 将scheme enum 属性静态数据中的value转成text
@@ -82,7 +118,35 @@
 				noData: false,
 				determinate: false,
 				offsetTop: 100,
+				fill: {
+					gradient: ["red", "green", "blue"]
+				},
+				loadingCssObject: {
+					'loading-css': true,
+					'loading-css-run': false
+				},
+				smLoadingCssObject: {
+					'sm-loading-css': true,
+					'sm-loading-css-run': false
+				},
+				smSmStyleObject: {},
+				smTextStyleObject: {}
 			}
+		},
+		computed: {
+			...mapGetters({
+				speedInfo: 'user/speedInfo',
+			}),
+			hasStarted() {
+				if (this.speedInfo && this.speedInfo.hasStarted) {
+					return this.speedInfo.hasStarted
+				} else {
+					return false
+				}
+			},
+		},
+		components: {
+			VueAwesomeProgress
 		},
 
 		onLoad(e) {
@@ -90,11 +154,27 @@
 			console.log('userid getted:' + JSON.stringify(this.userId))
 
 			this.gameName = e.name
+			this.gameId = e.id
 			this.processes = e.processes
 			this.peerId = e.peer_id
 			this.peerName = e.peer_name
-			console.log('gameName getted:' + this.gameName)
-			console.log('processes getted:' + this.processes)
+			this.picurl = e.picurl
+			this.smSmStyleObject = {
+				'backgroundImage': 'url(' + this.picurl + ')',
+			}
+
+			console.log('onLoad.speedInfo', this.speedInfo.hasStarted);
+			if (this.speedInfo.hasStarted) {
+				this.setStartedStatus()
+			}
+
+		},
+		onBackPress() {
+			console.log("---------------onBackPress--------------------")
+			uni.switchTab({
+				url: '/pages/list/list'
+			})
+			return true
 		},
 		onReady() {
 			if (this._id) {
@@ -106,9 +186,27 @@
 			});
 		},
 		methods: {
+			//生成从minNum到maxNum的随机数
+			randomNum(minNum, maxNum) {
+				switch (arguments.length) {
+					case 1:
+						return parseInt(Math.random() * minNum + 1, 10);
+						break;
+					case 2:
+						return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
+						break;
+					default:
+						return 0;
+						break;
+				}
+			},
 			...mapGetters({
 				userInfo: 'user/info'
 			}),
+			// 格式化文字
+			formatPeople(percentage) {
+				return Math.round(percentage) + '%'
+			},
 			testanim() {
 				if (this.loading) {
 					this.loading = false
@@ -116,59 +214,182 @@
 					this.loading = true
 				}
 			},
+			stepNumber(start, step, target, duration) {
+				// 设置定时器，用来反复横跳的，哈哈哈
+				let t = setInterval(() => {
+					// 每次增加一点步进值
+					start += step
+					this.progress = start + '%'
+					// 开始值大于传过来的的值，说明 到点了，不用 继续横跳了
+					if (start > target) {
+						clearInterval(t)
+						// 把穿过的值赋给start，结束
+						this.progress = target + '%'
+						// 清掉计时器
+						t = null
+					}
+				}, duration * 1000 / (target - start))
+			},
 			async startSpeed() {
-				this.dur = 5
-				this.progress = 20
-				let res = await db.collection('speednet-membership').where('user_id=="' + this.userId + '"').get()
-				// .field("_id,peer_name,server").get()
-				console.log(res)
-				this.progress = 50
+				if (this.speedBtn == '启动加速') {
+					this.setStartingStatus()
 
-				if (res.result.data.length == 0) {
-					uni.showToast({
-						title: '会员时长不足，请先购买订阅',
-						icon: 'error',
-					});
-					setTimeout(function() {
-						uni.hideToast();
-						uni.navigateTo({
-							url: '/pages/speednet-member-plan/list',
-							animationType: 'fade-in'
-						});
-					}, 2000);
-				} else {
-					let membership = res.result.data[0]
-					if (membership.is_pause) {
-						uni.showToast({
-							title: '您的加速已暂停，请先恢复加速',
-							icon: 'error',
-						});
-						this.progress = 70;
-					} else if (membership.remaining_minites == 0) {
+					let res = await db.collection('speednet-membership').where('user_id=="' + this.userId + '"').get()
+
+					if (res.result.data.length == 0) {
 						uni.showToast({
 							title: '会员时长不足，请先购买订阅',
 							icon: 'error',
 						});
-						this.progress = 0;
-					} else {
-						let res = await db.collection("speednet-peer").where('_id=="' + this.peerId + '"').get()
-						var event = res.result.data
-						event[0].processes = this.processes
-						event[0].remaining=membership.remaining_minites
-
-						uni.sendNativeEvent("startSpeed", event, function(e) {
-							this.configyaml =JSON.stringify(e)
-							uni.showToast({
-								title: JSON.stringify(e),
-								icon: 'error',
+						setTimeout(function() {
+							uni.hideToast();
+							uni.navigateTo({
+								url: '/pages/speednet-member-plan/list',
+								animationType: 'fade-in'
 							});
-							console.log("sendNativeEvent-----------回调" + JSON.stringify(e));
-						});
+						}, 2000);
+					} else {
+						let membership = res.result.data[0]
+						if (membership.is_pause) {
+							uni.showModal({
+								title: "提示",
+								content: '您的加速已暂停，请先恢复加速',
+								showCancel: false,
+								confirmText: "知道了",
+								complete: () => {
+									uni.reLaunch({
+										url: '/pages/speednet-membership/memberCenter'
+									})
+								}
+							});
+						} else if (membership.remaining_minites == 0) {
+							uni.showModal({
+								title: "提示",
+								content: '会员时长不足，请先购买订阅',
+								showCancel: false,
+								confirmText: "知道了",
+								complete: () => {
+									uni.reLaunch({
+										url: '/pages/speednet-membership/memberCenter'
+									})
+								}
+							});
+							this.progress = 0;
+						} else {
+							let res = await db.collection("speednet-peer").where('_id=="' + this.peerId + '"').get()
+							var event = res.result.data
+							event[0].processes = this.processes
+							event[0].remaining = membership.remaining_minites
 
-						this.progress = 90;
-						console.log(res.result)
+							this.setStorage(true)
+
+							uni.sendNativeEvent("startSpeed", event, function(e) {
+								// this.configyaml = JSON.stringify(e)
+								uni.showToast({
+									title: JSON.stringify(e),
+									icon: 'error',
+								});
+								console.log("sendNativeEvent-----------回调" + JSON.stringify(e));
+							});
+							this.setStartedStatus()
+						}
 					}
+				} else {
+					uni.sendNativeEvent("pause", event, function(e) {
+						// this.configyaml = JSON.stringify(e)
+						uni.showToast({
+							title: JSON.stringify(e),
+							icon: 'error',
+						});
+						console.log("sendNativeEvent-----------回调" + JSON.stringify(e));
+					});
+					this.setStopStatus()
+					this.setStorage(false)
 				}
+			},
+			setStorage(hasStarted) {
+				var newList = [{
+					gameId: this.gameId,
+					gameName: this.gameName,
+					processes: this.processes,
+					peerId: this.peerId,
+					peerName: this.peerName,
+					picurl: this.picurl,
+					start_date: Date(),
+				}, ]
+				var mySpeed = {
+					gameId: this.gameId,
+					gameName: this.gameName,
+					peerId: this.peerId,
+					peerName: this.peerName,
+					picurl: this.picurl,
+					start_date: Date(),
+				}
+				var speedInfo = {
+					hasStarted: hasStarted,
+					mySpeedList: newList,
+					runningGameId: this.gameId,
+					runningGame: mySpeed
+				}
+				store.commit('user/startSpeed', speedInfo)
+			},
+
+			setStartingStatus() {
+				this.speedBtn = '正在启动加速'
+				this.loadingCssObject = {
+					'loading-css-run': true,
+					'loading-css': false
+				}
+				this.smLoadingCssObject = {
+					'sm-loading-css': false,
+					'sm-loading-css-run': true
+				}
+				this.smSmStyleObject = {
+					'backgroundImage': '',
+				}
+				this.smTextStyleObject = {
+					'display': 'block'
+				}
+				this.stepNumber(0, 2, 100, 5)
+			},
+			setStartedStatus() {
+				this.loadingCssObject = {
+					'loading-css-run': true,
+					'loading-css': false
+				}
+				this.smLoadingCssObject = {
+					'sm-loading-css': false,
+					'sm-loading-css-run': true
+				}
+				this.smSmStyleObject = {
+					'backgroundImage': '',
+				}
+				this.smTextStyleObject = {
+					'display': 'block'
+				}
+				this.progress = '100%';
+				this.speedBtn = '停止加速'
+				this.net_delay = this.randomNum(4, 48)
+				this.loss = this.randomNum(2, 9)
+				this.faster = this.randomNum(80, 99)
+			},
+			setStopStatus() {
+				this.speedBtn = '启动加速'
+				this.loadingCssObject = {
+					'loading-css-run': false,
+					'loading-css': true
+				}
+				this.smLoadingCssObject = {
+					'sm-loading-css': true,
+					'sm-loading-css-run': false
+				}
+				this.smSmStyleObject = {
+					'backgroundImage': 'url(' + this.picurl + ')',
+				}
+				this.smTextStyleObject = {
+					'display': 'none'
+				}
+				this.stepNumber(0, 2, 100, 5)
 			},
 			async showPeers(regionId) {
 				this.mypeerList = []
@@ -182,30 +403,208 @@
 							"peer_name": j,
 							"_id": "ddd"
 						}
-						// peer.peer_name=j;
 						this.mypeerList.push(mypeer)
 					}
 				}
-				// for (var i = 0; i < 20; i++) {
-				// 	this.mypeerList.push(res.result.data[1])
-				// }
 				this.chooseRegion = regionId
-				// this.$refs.popup.open()
 				this.$refs.pop.show();
-			}
+			},
 
 		}
 	}
 </script>
 
 <style scoped="">
-	.circle {
-		margin: 20px;
-		padding: 20px;
+	@keyframes loading-360 {
+		0% {
+			transform: rotate(0deg);
+			/*动画起始的时候旋转了0度*/
+		}
+
+		100% {
+			transform: rotate(360deg);
+			/*动画结束的时候旋转了360度*/
+		}
+	}
+
+	@keyframes r-loading-360 {
+		0% {
+			transform: rotate(360deg);
+			/*动画起始的时候旋转了0度*/
+		}
+
+		100% {
+			transform: rotate(0deg);
+			/*动画结束的时候旋转了360度*/
+		}
+	}
+
+	.loading-css {
+		animation: loading-360 3s infinite linear;
+		animation-play-state: paused;
+		/*给圆环添加旋转360度的动画，并且是无限次*/
+		width: 200px;
+		/*先将loading区域变成正方形*/
+		height: 200px;
+		/* display: inline-block; */
+		/*将loading区域变成行内元素，防止旋转的时候，100%宽度都在旋转*/
+		border: 3px solid #f3f3f3;
+		/*设置四周边框大小，并将颜色设置为浅白色*/
+		border-top: 3px solid red;
+		/*将上边框颜色设置为红色高亮，以便旋转的时候能够看到旋转的效果*/
+		border-radius: 50%;
+		/*将边框和内容区域都变成圆形*/
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -100px;
+		margin-left: -100px;
+	}
+
+	.loading-css-run {
+		animation: loading-360 3s infinite linear;
+		animation-play-state: running;
+		/*给圆环添加旋转360度的动画，并且是无限次*/
+		width: 200px;
+		/*先将loading区域变成正方形*/
+		height: 200px;
+		/* display: inline-block; */
+		/*将loading区域变成行内元素，防止旋转的时候，100%宽度都在旋转*/
+		border: 3px solid #f3f3f3;
+		/*设置四周边框大小，并将颜色设置为浅白色*/
+		border-top: 3px solid red;
+		/*将上边框颜色设置为红色高亮，以便旋转的时候能够看到旋转的效果*/
+		border-radius: 50%;
+		/*将边框和内容区域都变成圆形*/
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -100px;
+		margin-left: -100px;
+	}
+
+	.sm-loading-css {
+		animation: r-loading-360 2s infinite linear;
+		animation-play-state: paused;
+		/*给圆环添加旋转360度的动画，并且是无限次*/
+		width: 180px;
+		/*先将loading区域变成正方形*/
+		height: 180px;
+		/* display: inline-block; */
+		/*将loading区域变成行内元素，防止旋转的时候，100%宽度都在旋转*/
+		border: 2px solid #f3f3f3;
+		/*设置四周边框大小，并将颜色设置为浅白色*/
+		border-top: 2px solid red;
+		/*将上边框颜色设置为红色高亮，以便旋转的时候能够看到旋转的效果*/
+		border-radius: 50%;
+		/*将边框和内容区域都变成圆形*/
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -90px;
+		margin-left: -90px;
+	}
+
+	.sm-loading-css-run {
+		animation: r-loading-360 2s infinite linear;
+		animation-play-state: running;
+		/*给圆环添加旋转360度的动画，并且是无限次*/
+		width: 180px;
+		/*先将loading区域变成正方形*/
+		height: 180px;
+		/* display: inline-block; */
+		/*将loading区域变成行内元素，防止旋转的时候，100%宽度都在旋转*/
+		border: 2px solid #f3f3f3;
+		/*设置四周边框大小，并将颜色设置为浅白色*/
+		border-top: 2px solid red;
+		/*将上边框颜色设置为红色高亮，以便旋转的时候能够看到旋转的效果*/
+		border-radius: 50%;
+		/*将边框和内容区域都变成圆形*/
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -90px;
+		margin-left: -90px;
+	}
+
+	.circle-wrapper {
+		/* background-color: chocolate; */
+		width: 100%;
+		height: 230px;
+		position: relative;
+		text-align: center;
+		margin-top: 20px;
+	}
+
+	.sm-sm-loading-css {
+		/* animation: r-loading-360 0.8s infinite linear; */
+		/*给圆环添加旋转360度的动画，并且是无限次*/
+		width: 100px;
+		/*先将loading区域变成正方形*/
+		height: 100px;
+		/* display: inline-block; */
+		/*将loading区域变成行内元素，防止旋转的时候，100%宽度都在旋转*/
+		border: 2px solid #f3f3f3;
+		/*设置四周边框大小，并将颜色设置为浅白色*/
+		/* border-top: 3px solid red; */
+		/*将上边框颜色设置为红色高亮，以便旋转的时候能够看到旋转的效果*/
+		border-radius: 50%;
+		/*将边框和内容区域都变成圆形*/
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -50px;
+		margin-left: -50px;
+		background-size: 100%;
+		font-size: 30px;
+		text-align: center;
+		line-height: 100px;
+		color: dodgerblue;
+	}
+
+	.md-loading-css {
+		/* animation: r-loading-360 0.8s infinite linear; */
+		/*给圆环添加旋转360度的动画，并且是无限次*/
+		width: 120px;
+		/*先将loading区域变成正方形*/
+		height: 120px;
+		/* display: inline-block; */
+		/*将loading区域变成行内元素，防止旋转的时候，100%宽度都在旋转*/
+		border: 2px solid #f3f3f3;
+		/*设置四周边框大小，并将颜色设置为浅白色*/
+		/* border-top: 3px solid red; */
+		/*将上边框颜色设置为红色高亮，以便旋转的时候能够看到旋转的效果*/
+		border-radius: 50%;
+		/*将边框和内容区域都变成圆形*/
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -60px;
+		margin-left: -60px;
+		background-size: 100%;
+		font-size: 30px;
+		text-align: center;
+		line-height: 100px;
+		color: dodgerblue;
 	}
 
 	.region-tag {
 		margin: 20px;
+	}
+
+	.data-col {
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+	}
+
+	.b-title-row,
+	.b-data-row {
+		width: 100%;
+		margin-bottom: 20px;
+		display: flex;
+		align-items: center;
+		flex-direction: row;
 	}
 
 	.container {
@@ -213,21 +612,38 @@
 		display: flex;
 		align-items: center;
 		flex-direction: column;
+		/* 		height: 3000px;
+		background-image: url('/static//mybg.jpg'); */
 	}
 
 	.btns {
-		margin-top: 30px;
-		padding-top: 300px;
-		width: 300px;
-		/* #ifndef APP-NVUE */
+		margin: 60px 100px 100px 100px;
+		background-color: mediumseagreen;
 		display: flex;
-		/* #endif */
-		/* flex-direction: row; */
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		height: 45px;
+		width: 250px;
+		border-radius: 50px;
+
+		&-text {
+			font-size: 30px;
+			// color: #1C1C1C;
+		}
+	}
+
+	/* 	.btns {
+		background-color: mediumseagreen;
+		color: mediumseagreen;
+		margin-top: 50px;
+		margin-bottom: 100px;
+		width: 200px;
 	}
 
 	.btns button {
 		flex: 100;
-	}
+	} */
 
 	.btn-delete {
 		margin-left: 10px;

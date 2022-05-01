@@ -1,0 +1,276 @@
+<template>
+	<view class="pages">
+		<!-- #ifndef H5 -->
+		<statusBar></statusBar>
+		<!-- #endif -->
+
+		<!-- 搜索功能 -->
+		<view class="uni-search-box">
+			<uni-search-bar v-model="keyword" ref="searchBar" radius="100" cancelButton="none" disabled
+				:placeholder="inputPlaceholder" />
+			<view class="cover-search-bar" @click="searchClick"></view>
+		</view>
+
+		<unicloud-db ref='udb' v-slot:default="{data,pagination,hasMore, loading, error, options}" @error="onqueryerror"
+			:collection="'speednet-game'" :orderby="'create_date desc'" :page-size="10">
+			<!-- 基于 uni-list 的页面布局 field="user_id.username"-->
+			<uni-list class="uni-list" :border="false" :style="{height:listHight}">
+
+				<!-- 作用于app端nvue页面的下拉加载 -->
+				<!-- #ifdef APP-NVUE -->
+				<refreshBox @refresh="refresh" :loading="loading"></refreshBox>
+				<!-- #endif -->
+
+				<!-- 列表渲染 -->
+				<uni-list-item class="game-item" :to="'/pages/speednet-game/detail?id='+item._id"
+					v-for="(item,index) in data" :key="index" :showArrow="'true'">
+					<!-- 通过header插槽定义列表左侧图片 -->
+					<template v-slot:header>
+						<!-- <view class="imgc"></view> -->
+						<image class="avatar" :src="item.picture.url" mode="widthFix"></image>
+					</template>
+					<!-- 通过body插槽定义布局 -->
+					<template v-slot:body class="slot-box">
+						<view class="main">
+							<text class="title">{{item.game_name}}</text>
+							<view class="info">
+								<!-- <text class="author">{{item.user_id[0]?item.user_id[0].username:''}}</text> -->
+								<uni-dateformat class="last_modify_date" :date="item.create_date" format="yyyy-MM-dd"
+									:threshold="[60000, 2592000000]" />
+							</view>
+						</view>
+					</template>
+				</uni-list-item>
+				<!-- 加载状态：上拉加载更多，加载中，没有更多数据了，加载错误 -->
+				<!-- #ifdef APP-PLUS -->
+				<uni-list-item>
+					<template v-slot:body>
+						<!-- #endif -->
+						<uni-load-state @networkResume="refresh" :state="{data,pagination,hasMore, loading, error}"
+							@loadMore="loadMore">
+						</uni-load-state>
+						<!-- #ifdef APP-PLUS -->
+					</template>
+				</uni-list-item>
+				<!-- #endif -->
+			</uni-list>
+		</unicloud-db>
+	</view>
+</template>
+
+<script>
+	var cdbRef, currentWebview;
+	import statusBar from "@/uni_modules/uni-nav-bar/components/uni-nav-bar/uni-status-bar";
+
+	const db = uniCloud.database();
+
+	export default {
+		components: {
+			statusBar
+		},
+		onTabItemTap(e) {
+			// tab 点击时执行，此处直接接收单击事件
+			console.log(e)
+			if (this.tabClick) { // 200ms 内再次点击
+				// 这里就是模拟的双击事件，可以写类似数据刷新相关处理
+				uni.reLaunch({
+					url: '/pages/list/list'
+				})
+			}
+			this.tabClick = true
+			setTimeout(() => {
+				this.tabClick = false // 200ms 内没有第二次点击，就当作单击
+			}, 200)
+
+		},
+		computed: {
+			inputPlaceholder(e) {
+				if (uni.getStorageSync('CURRENT_LANG') == "en") {
+					return 'Please enter the search content'
+				} else {
+					return '请输入搜索内容'
+				}
+			},
+			colList() {
+				return db.collection('speednet-game').where('"status" == 1').get();
+			}
+			// colList() {
+			// 	return [
+			// 		db.collection('opendb-news-articles').where(this.where).field(
+			// 			'avatar,title,last_modify_date,user_id').getTemp(),
+			// 		db.collection('uni-id-users').field('_id,username').getTemp()
+			// 	]
+			// }
+		},
+		data() {
+			return {
+				where: '"article_status" == 1',
+				keyword: "",
+				showRefresh: false,
+				listHight: 0,
+				tabClick: false // true 表示是两次点击中的第一次点了 tabBar
+			}
+		},
+		watch: {
+			keyword(keyword, oldValue) {
+				let where = '"article_status" == 1 '
+				if (keyword) {
+					this.where = where + `&& /${keyword}/.test(title)`;
+				} else {
+					this.where = where;
+				}
+			}
+		},
+		async onReady() {
+			// #ifdef APP-NVUE
+			/* 可用窗口高度 - 搜索框高 - 状态栏高 */
+			this.listHight = uni.getSystemInfoSync().windowHeight - uni.getSystemInfoSync().statusBarHeight - 50 +
+				'px';
+			// #endif
+			// #ifndef APP-NVUE
+			this.listHight = 'auto'
+			// #endif
+			cdbRef = this.$refs.udb
+		},
+		async onShow() {
+			this.keyword = getApp().globalData.searchText
+			getApp().globalData.searchText = ''
+			//这里仅演示如何，在onShow生命周期获取设备位置，并在设备或者应用没有权限时自动引导。设置完毕自动重新获取。
+			//你可以基于他做自己的业务，比如：根据距离由近到远排序列表数据等
+			// uni.showLoading({
+			// 	title:"获取定位中"
+			// });
+			//默认h5端不获取定位
+
+			// if(location){
+			// 	uni.showToast({
+			// 		title: JSON.stringify(location),
+			// 		icon: 'none'
+			// 	});
+			// }
+			// uni.hideLoading()
+		},
+		methods: {
+			searchClick(e) { //点击搜索框
+				uni.hideKeyboard();
+				uni.navigateTo({
+					url: '/pages/list/search/search',
+					animationType: 'fade-in'
+				});
+			},
+			retry() {
+				this.refresh()
+			},
+			refresh() {
+				cdbRef.loadData({
+					clear: true
+				}, () => {
+					uni.stopPullDownRefresh()
+					// #ifdef APP-NVUE
+					this.showRefresh = false
+					// #endif
+					console.log('end');
+				})
+				console.log('refresh');
+			},
+			loadMore() {
+				cdbRef.loadMore()
+			},
+			onqueryerror(e) {
+				console.error(e);
+			},
+			onpullingdown(e) {
+				console.log(e);
+				this.showRefresh = true
+				if (e.pullingDistance > 100) {
+					this.refresh()
+				}
+			}
+		},
+		// #ifndef APP-NVUE
+		onPullDownRefresh() {
+			this.refresh()
+		},
+		onReachBottom() {
+			this.loadMore()
+		}
+		// #endif
+	}
+</script>
+
+<style scoped>
+	/* #ifndef APP-NVUE */
+	view {
+		display: flex;
+		box-sizing: border-box;
+		flex-direction: column;
+	}
+
+	.game-item {
+		margin: 5px 10px 5px 10px;
+		border: 4px solid transparent;
+		border-radius: 16px;
+		background-clip: padding-box, border-box;
+		background-origin: padding-box, border-box;
+		background-image: linear-gradient(90deg, #F5FFFA, #F5F5F5), linear-gradient(90deg, #F5FFFA, #F5F5F5);
+		/* 		border: 3px solid silver;
+		border-top: 3px solid red;
+		border-radius: 50%; */
+	}
+
+	/* #endif */
+	.pages {
+		background-color: #FFF;
+	}
+
+	.avatar {
+		width: 200rpx;
+		height: 200rpx;
+		margin-right: 10rpx;
+		border-radius: 8px;
+	}
+
+	.main {
+		justify-content: space-between;
+	}
+
+	.title {
+		width: 480rpx;
+		font-size: 32rpx;
+	}
+
+	.info {
+		flex-direction: row;
+		justify-content: space-between;
+	}
+
+	.author,
+	.last_modify_date {
+		font-size: 28rpx;
+		color: #999999;
+	}
+
+	.uni-search-box {
+		background-color: #FFFFFF;
+		position: sticky;
+		height: 50px;
+		top: 0;
+		left: 0;
+		/* #ifndef APP-PLUS */
+		z-index: 9;
+		/* #endif */
+		/* #ifdef MP-WEIXIN */
+		width: 580rpx;
+		/* #endif */
+	}
+
+	.cover-search-bar {
+		height: 50px;
+		position: relative;
+		top: -50px;
+		margin-bottom: -50px;
+		/* #ifndef APP-NVUE */
+		z-index: 999;
+		/* #endif */
+	}
+</style>

@@ -1,0 +1,9 @@
+{
+	"id": "myf-uni-electron-template",
+	"name": "uni-electron-template",
+	"version": "1.0.0",
+	"description": "uni-app的electron运行环境配置模板",
+	"keywords": [
+		"electron"
+	]
+}

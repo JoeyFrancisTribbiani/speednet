@@ -81,6 +81,12 @@
 			}
 		}
 	},
+	"devDependencies": {
+		"sass-loader": "^7.3.1"
+	},
 	"dependencies": {
+		"v-circle": "^0.1.3",
+		"vue-awesome-progress": "^1.9.7",
+		"vue2-circle-progress": "^1.2.3"
 	}
 }

@@ -6,7 +6,7 @@
 		<view :class="{ 'uni-list-item--disabled': disabled }"
 			:hover-class="(!clickable && !link) || disabled || showSwitch ? '' : 'uni-list-item--hover'"
 			class="uni-list-item" @click="onClick">
-			<view v-if="!isFirstChild" class="border--left" :class="{ 'uni-list--border': border }"></view>
+			<!-- <view v-if="!isFirstChild" class="border--left" :class="{ 'uni-list--border': border }"></view> -->
 			<view class="uni-list-item__container"
 				:class="{ 'container--right': showArrow || link, 'flex--direction': direction === 'column' }">
 				<slot name="header">
@@ -95,7 +95,7 @@
 				default: ''
 			},
 			ellipsis: {
-				type: [Number,String],
+				type: [Number, String],
 				default: 0
 			},
 			disabled: {
@@ -248,7 +248,7 @@
 						uni.switchTab(callback)
 						break
 					default:
-					uni.navigateTo(callback)
+						uni.navigateTo(callback)
 				}
 			}
 		}
@@ -453,7 +453,7 @@
 		/* #endif */
 		/* #ifdef APP-NVUE */
 		lines: 1;
-		text-overflow:ellipsis;
+		text-overflow: ellipsis;
 		/* #endif */
 	}
 
@@ -468,7 +468,7 @@
 
 		/* #ifdef APP-NVUE */
 		lines: 2;
-		text-overflow:ellipsis;
+		text-overflow: ellipsis;
 		/* #endif */
 	}
 </style>

@@ -32,6 +32,7 @@
 				<!-- 显示多头像 -->
 				<uni-list-chat title="uni-app" :avatar-list="avatarList" note="您收到一条新的消息" time="2020-02-02 20:20"
 					badge-positon="left" badge-text="dot"></uni-list-chat>
+
 				<!-- 自定义右侧内容 -->
 				<uni-list-chat title="uni-app" :avatar-list="avatarList" note="您收到一条新的消息" time="2020-02-02 20:20"
 					badge-positon="left" badge-text="dot">
@@ -149,10 +150,10 @@
 			// });
 			//默认h5端不获取定位
 			// #ifndef H5
-			let location = await gps.getLocation({
-				geocode: true
-			})
-			console.log(location);
+			// let location = await gps.getLocation({
+			// 	geocode: true
+			// })
+			// console.log(location);
 			// #endif
 			// if(location){
 			// 	uni.showToast({

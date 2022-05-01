@@ -3,7 +3,7 @@
 			"path": "pages/list/list",
 			"style": {
 				// #ifndef APP-PLUS
-				"enablePullDownRefresh": true,
+				"enablePullDownRefresh": false,
 				// #endif
 				"navigationStyle": "custom"
 			}
@@ -223,7 +223,8 @@
 		}, {
 			"path": "pages/speednet-myspeed/detail",
 			"style": {
-				"navigationBarTitleText": "我的加速"
+				"navigationBarTitleText": "我的加速",
+				"backgroundColor": "#000"
 			}
 		}, {
 			"path": "pages/speednet-membership/detail",
