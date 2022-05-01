@@ -1,0 +1,23 @@
+port: 7890
+socks-port: 7891
+mixed-port: 7893
+allow-lan: false
+mode: rule
+log-level: info
+external-controller: 127.0.0.1:9090
+proxies:
+- name: "ss"
+  type: ss                                  # 代理类型
+  server: 93.179.113.234                        # 服务器 IP
+  port: 29333                                 #  端口号
+  cipher: chacha20-ietf-poly1305   # 加密方法11111
+  password: 8Ncmpb4zstSeo4iYHq5rfA==                # SS 密码
+  udp: true                                #默认不开启
+proxy-groups:
+  - name: global
+    type: select
+    proxies:
+      - ss
+rules:
+  - DOMAIN-SUFFIX,google.com,global
+  - MATCH,global

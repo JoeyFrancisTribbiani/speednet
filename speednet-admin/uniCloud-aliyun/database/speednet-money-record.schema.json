@@ -1,0 +1,38 @@
+{
+	"bsonType": "object",
+	"required": ["user_id", "balance", "money", "membership_hours"],
+	"permission": {
+		"read": true,
+		"create": true,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"title": "ID，系统自动生成"
+		},
+		"user_id": {
+			"bsonType": "string",
+			"title": "用户id"
+		},
+		"user_name": {
+			"bsonType": "string",
+			"title": "用户名"
+		},
+		"money": {
+			"bsonType": "number",
+			"title": "充值的人民币"
+		},
+		"membership_hours": {
+			"bsonType": "int",
+			"title": "购买的小时数"
+		},
+		"create_date": {
+			"bsonType": "timestamp",
+			"title": "创建时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		},
+	}
+}

@@ -1,19 +1,42 @@
 // 开发文档: https://uniapp.dcloud.net.cn/uniCloud/cloud-obj
 module.exports = {
-	subscribe: async function(userId = '', planHours = 0) {
+	subscribe: async function(userId = '', userName = '', money = 0, planHours = 0) {
 		var result = false
 		const db = uniCloud.database()
 		var current = await db.collection("speednet-membership").where({
 			user_id: userId
 		}).limit(1).get()
 		if (current.data[0]) {
-			var docId = current.data[0]._id
-			var current_remaining = current.data[0].remaining_minites
+			var myship = current.data[0]
+			var docId = myship._id
+
+			var current_remaining = myship.remaining_minites
+			if (!myship.is_pause) {
+				var now = new Date().getTime()
+				var reverse = Date.parse(myship.reverse_date)
+				var sub = now - reverse
+				var my_time = Math.floor(sub / (60 * 1000))
+				current_remaining = myship.remaining_minites - my_time
+			}
+
+			var oldReverseDate = myship.reverse_date
+
+			if (current_remaining < 0) {
+				current_remaining = 0
+				oldReverseDate = Date()
+			}
 			var addres = await db.collection("speednet-membership").doc(docId).update({
 				remaining_minites: planHours * 60 + current_remaining,
 				is_pause: false,
+				reverse_date: oldReverseDate
 			})
 			if (addres) {
+				var record = await db.collection("speednet-money-record").add({
+					user_id: userId,
+					user_name: userName,
+					money: money,
+					membership_hours: planHours
+				})
 				result = true
 			} else {
 				result = false
@@ -29,11 +52,17 @@ module.exports = {
 
 			console.log(addres);
 			if (addres) {
+				var record = await db.collection("speednet-money-record").add({
+					user_id: userId,
+					user_name: userName,
+					money: money,
+					membership_hours: planHours
+				})
 				result = true
 			} else {
 				result = false
 			}
-		}		
+		}
 		return result
 	},
 	getMembership: async function(userId = '') {
@@ -41,7 +70,24 @@ module.exports = {
 		var membership = await db.collection("speednet-membership").where({
 			user_id: userId
 		}).get()
-		return membership.data[0]
+
+		if (membership.data.length == 0) {
+			return ""
+		}
+
+		var myship = membership.data[0]
+
+
+		if (!myship.is_pause) {
+			var now = new Date().getTime()
+			var reverse = Date.parse(myship.reverse_date)
+			var sub = now - reverse
+			var my_time = Math.floor(sub / (60 * 1000))
+			var remaining = myship.remaining_minites - my_time
+
+			myship.remaining_minites = remaining < 0 ? 0 : remaining
+		}
+		return myship
 	},
 	pause: async function(userId = '') {
 		const db = uniCloud.database()

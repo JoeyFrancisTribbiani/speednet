@@ -1,18 +1,23 @@
 // 上次启动时的用户信息
 let userInfoHistory = uni.getStorageSync('userInfo') || {};
 let speedInfoHistory = uni.getStorageSync('speedInfo') || {
+	timer: {},
 	hasStarted: false,
 	mySpeedList: [],
 	runningGameId: '',
 	runningGame: {}
 };
+let globalSpeedStatusHistory = uni.getStorageSync('globalSpeedStatus') || false
+
+
 let state = {
 		//是否已经登录
 		hasLogin: Boolean(Object.keys(userInfoHistory).length),
 		//用户信息
 		info: userInfoHistory,
 		// 加速状态
-		speedInfo: speedInfoHistory
+		speedInfo: speedInfoHistory,
+		globalSpeedStatus: globalSpeedStatusHistory
 	},
 	getters = {
 		info(state) {
@@ -23,30 +28,41 @@ let state = {
 		},
 		speedInfo(state) {
 			return state.speedInfo
+		},
+		globalSpeedStatus(state) {
+			return state.globalSpeedStatus
 		}
 	},
 	mutations = {
+		// setStatus(state, status) {
+		// 	state.speedInfo.hasStarted = status
+
+		// 	uni.setStorageSync('speedInfo', state.speedInfo);
+		// },
+
 		startSpeed(state, info) { //登录成功后的操作
-			console.log('receivedSpeedList', info.mySpeedList);
+			// console.log('receivedSpeedList', JSON.stringify(info.mySpeedList));
 			//原有的结合传来的参数
 			let _info = state.speedInfo;
-			console.log('state.speedInfo', state.speedInfo);
-			console.log('state.myHistorySpeedList', state.speedInfo.mySpeedList);
+			// console.log('state.speedInfo', JSON.stringify(_info));
+			// console.log('state.myHistorySpeedList', JSON.stringify(state.speedInfo.mySpeedList));
 			state.speedInfo = info
-			state.speedInfo.mySpeedList = Object.assign([], _info.mySpeedList, info.mySpeedList);
-			console.log('state.mySpeedList', state.speedInfo.mySpeedList);
+			// state.speedInfo.mySpeedList = Object.assign([], _info.mySpeedList, info.mySpeedList);
+			var temp = {};
+			var result = [];
+			var totalList = _info.mySpeedList.concat(info.mySpeedList);
+			// console.log('totalList', JSON.stringify(totalList));
+			totalList.map(function(item, index) {
+				if (!temp[item.gameId]) {
+					result.push(item);
+					temp[item.gameId] = true;
+				}
+			});
+			state.speedInfo.mySpeedList = result
+			// console.log('state.mySpeedList', JSON.stringify(state.speedInfo.mySpeedList));
 			//存储最新的用户数据到本地持久化存储
+			// state.speedInfo.mySpeedList = []
 			uni.setStorageSync('speedInfo', state.speedInfo);
-			// if (info.token) {
-			// 	uni.setStorage({
-			// 		key: 'uni_id_token',
-			// 		data: state.info.token,
-			// 		complete(e) {
-			// 			// console.log('setStorage-------',e);
-			// 		}
-			// 	});
-			// 	uni.setStorageSync('uni_id_token_expired', state.info.tokenExpired)
-			// }
 		},
 		logout(state) {
 			state.info = {};

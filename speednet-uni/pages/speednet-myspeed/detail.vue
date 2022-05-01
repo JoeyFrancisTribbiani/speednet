@@ -20,6 +20,9 @@
 			<text class="button-text">{{speedBtn}}</text>
 		</view>
 
+
+		<!-- <text>{{remaining}}</text> -->
+
 		<uni-row class="b-title-row">
 			<uni-col :span="8" class="data-col">
 				<view class=" b-col">
@@ -72,10 +75,7 @@
 				</view>
 			</uni-col>
 		</uni-row>
-		<!-- 		<view class=".btns">
-			<button type="primary" @click="testanim">ceshi</button>
-		</view> -->
-		<p>{{this.configyaml}}</p>
+
 	</view>
 </template>
 
@@ -96,11 +96,6 @@
 	export default {
 		data() {
 			return {
-				peerIcon: {
-					color: '#4cd964',
-					size: '22',
-					type: 'map-pin-ellipse'
-				},
 				speedBtn: '启动加速',
 				sm_anim: '',
 				net_delay: 22,
@@ -109,18 +104,10 @@
 				progress: '',
 				duration: 3,
 				queryWhere: '',
-				options: {
-					// 将scheme enum 属性静态数据中的value转成text
-					...enumConverter
-				},
-				configyaml: '',
-				loading: true,
-				noData: false,
-				determinate: false,
-				offsetTop: 100,
-				fill: {
-					gradient: ["red", "green", "blue"]
-				},
+				clock: {},
+				remaining: 0,
+				processes: '',
+
 				loadingCssObject: {
 					'loading-css': true,
 					'loading-css-run': false
@@ -130,23 +117,15 @@
 					'sm-loading-css-run': false
 				},
 				smSmStyleObject: {},
-				smTextStyleObject: {}
+				smTextStyleObject: {},
+				startStatus: false
 			}
 		},
 		computed: {
 			...mapGetters({
 				speedInfo: 'user/speedInfo',
+				globalSpeedStatus: 'user/globalSpeedStatus'
 			}),
-			hasStarted() {
-				if (this.speedInfo && this.speedInfo.hasStarted) {
-					return this.speedInfo.hasStarted
-				} else {
-					return false
-				}
-			},
-		},
-		components: {
-			VueAwesomeProgress
 		},
 
 		onLoad(e) {
@@ -163,14 +142,9 @@
 				'backgroundImage': 'url(' + this.picurl + ')',
 			}
 
-			console.log('onLoad.speedInfo', this.speedInfo.hasStarted);
-			if (this.speedInfo.hasStarted) {
-				this.setStartedStatus()
-			}
-
 		},
 		onBackPress() {
-			console.log("---------------onBackPress--------------------")
+			// 返回键默认返回列表页面
 			uni.switchTab({
 				url: '/pages/list/list'
 			})
@@ -184,8 +158,37 @@
 			uni.setNavigationBarTitle({
 				title: this.gameName
 			});
+			// 进入页面后先判断真实VPN状态
+			// 如果VPN开启，那么设置为正在加速的状态
+			// 如果没有开启，为停止状态
+			var curStatus = this.getRativeStatus()
+			console.log("---------------------curStatus:" + curStatus)
+			if (curStatus == "running") {
+				this.setViewStartedStatus()
+			}
 		},
 		methods: {
+			getRativeStatus() { // 获取真实VPN状态
+				uni.sendNativeEvent("status", "event", function(e) {
+					// uni.showModal({
+					// 	title: "e",
+					// 	content: e,
+					// 	showCancel: false,
+					// 	confirmText: "知道了",
+					// });
+					if (e == 'running') {
+						uni.setStorageSync('globalSpeedStatus', "running")
+					} else {
+						uni.setStorageSync('globalSpeedStatus', "stoped")
+					}
+					// var toastTitle = "sync:" + uni.getStorageSync('globalSpeedStatus')
+					// uni.showToast({
+					// 	title: toastTitle,
+					// 	icon: 'error',
+					// });
+				})
+				return uni.getStorageSync('globalSpeedStatus')
+			},
 			//生成从minNum到maxNum的随机数
 			randomNum(minNum, maxNum) {
 				switch (arguments.length) {
@@ -201,19 +204,14 @@
 				}
 			},
 			...mapGetters({
-				userInfo: 'user/info'
+				userInfo: 'user/info',
+				// speedInfo: 'user/speedInfo',
+				// globalSpeedStatus: 'this.globalSpeedStatus'
 			}),
-			// 格式化文字
-			formatPeople(percentage) {
-				return Math.round(percentage) + '%'
-			},
-			testanim() {
-				if (this.loading) {
-					this.loading = false
-				} else {
-					this.loading = true
-				}
-			},
+			// // 格式化文字
+			// formatPeople(percentage) {
+			// 	return Math.round(percentage) + '%'
+			// },
 			stepNumber(start, step, target, duration) {
 				// 设置定时器，用来反复横跳的，哈哈哈
 				let t = setInterval(() => {
@@ -232,24 +230,23 @@
 			},
 			async startSpeed() {
 				if (this.speedBtn == '启动加速') {
-					this.setStartingStatus()
-
-					let res = await db.collection('speednet-membership').where('user_id=="' + this.userId + '"').get()
-
-					if (res.result.data.length == 0) {
-						uni.showToast({
-							title: '会员时长不足，请先购买订阅',
-							icon: 'error',
+					this.setViewStartingStatus()
+					const membershipObj = uniCloud.importObject('membership')
+					var membership = await membershipObj.getMembership(this.userId)
+					console.log('membership:', JSON.stringify(membership))
+					if (membership == "") {
+						uni.showModal({
+							title: "提示",
+							content: '会员时长不足，请先购买订阅',
+							showCancel: false,
+							confirmText: "知道了",
+							complete: () => {
+								uni.reLaunch({
+									url: '/pages/speednet-membership/memberCenter'
+								})
+							}
 						});
-						setTimeout(function() {
-							uni.hideToast();
-							uni.navigateTo({
-								url: '/pages/speednet-member-plan/list',
-								animationType: 'fade-in'
-							});
-						}, 2000);
 					} else {
-						let membership = res.result.data[0]
 						if (membership.is_pause) {
 							uni.showModal({
 								title: "提示",
@@ -276,38 +273,38 @@
 							});
 							this.progress = 0;
 						} else {
+							this.remaining = membership.remaining_minites
+							console.log("----------------------------this.remaining:" + this.remaining)
 							let res = await db.collection("speednet-peer").where('_id=="' + this.peerId + '"').get()
 							var event = res.result.data
 							event[0].processes = this.processes
 							event[0].remaining = membership.remaining_minites
 
-							this.setStorage(true)
-
-							uni.sendNativeEvent("startSpeed", event, function(e) {
-								// this.configyaml = JSON.stringify(e)
-								uni.showToast({
-									title: JSON.stringify(e),
-									icon: 'error',
-								});
-								console.log("sendNativeEvent-----------回调" + JSON.stringify(e));
-							});
-							this.setStartedStatus()
+							uni.sendNativeEvent("startSpeed", event, function(e) {});
+							this.setSpeedInfoStorage()
+							uni.setStorageSync('globalSpeedStatus', "running")
+							this.setViewStartedStatus()
 						}
 					}
 				} else {
-					uni.sendNativeEvent("pause", event, function(e) {
-						// this.configyaml = JSON.stringify(e)
-						uni.showToast({
-							title: JSON.stringify(e),
-							icon: 'error',
-						});
-						console.log("sendNativeEvent-----------回调" + JSON.stringify(e));
-					});
-					this.setStopStatus()
-					this.setStorage(false)
+					this.stopAll()
 				}
 			},
-			setStorage(hasStarted) {
+			stopAll() {
+				uni.sendNativeEvent("pause", "event", function(e) {
+					var toastTitle = '停止成功'
+					if (!e) {
+						toastTitle = '停止失败'
+					}
+					uni.showToast({
+						title: toastTitle,
+						icon: 'error',
+					});
+				});
+				this.setViewStopStatus()
+				this.setSpeedInfoStorage()
+			},
+			setSpeedInfoStorage() {
 				var newList = [{
 					gameId: this.gameId,
 					gameName: this.gameName,
@@ -326,7 +323,7 @@
 					start_date: Date(),
 				}
 				var speedInfo = {
-					hasStarted: hasStarted,
+					hasStarted: false,
 					mySpeedList: newList,
 					runningGameId: this.gameId,
 					runningGame: mySpeed
@@ -334,7 +331,7 @@
 				store.commit('user/startSpeed', speedInfo)
 			},
 
-			setStartingStatus() {
+			setViewStartingStatus() {
 				this.speedBtn = '正在启动加速'
 				this.loadingCssObject = {
 					'loading-css-run': true,
@@ -352,28 +349,96 @@
 				}
 				this.stepNumber(0, 2, 100, 5)
 			},
-			setStartedStatus() {
-				this.loadingCssObject = {
-					'loading-css-run': true,
-					'loading-css': false
+			async setViewStartedStatus() {
+				const membershipObj = uniCloud.importObject('membership')
+				var membership = await membershipObj.getMembership(this.userId)
+				console.log('membership:', JSON.stringify(membership))
+				if (membership == "") {
+					uni.showModal({
+						title: "提示",
+						content: '会员时长不足，请先购买订阅',
+						showCancel: false,
+						confirmText: "知道了",
+						complete: () => {
+							uni.reLaunch({
+								url: '/pages/speednet-membership/memberCenter'
+							})
+						}
+					});
+				} else {
+					if (membership.is_pause) {
+						uni.showModal({
+							title: "提示",
+							content: '您的加速已暂停，请先恢复加速',
+							showCancel: false,
+							confirmText: "知道了",
+							complete: () => {
+								uni.reLaunch({
+									url: '/pages/speednet-membership/memberCenter'
+								})
+							}
+						});
+					} else if (membership.remaining_minites <= 0) {
+						uni.showModal({
+							title: "提示",
+							content: '会员时长不足，请先购买订阅',
+							showCancel: false,
+							confirmText: "知道了",
+							complete: () => {
+								uni.reLaunch({
+									url: '/pages/speednet-membership/memberCenter'
+								})
+							}
+						});
+					} else {
+						this.remaining = membership.remaining_minites
+						// 设置启动状态
+						this.loadingCssObject = {
+							'loading-css-run': true,
+							'loading-css': false
+						}
+						this.smLoadingCssObject = {
+							'sm-loading-css': false,
+							'sm-loading-css-run': true
+						}
+						this.smSmStyleObject = {
+							'backgroundImage': '',
+						}
+						this.smTextStyleObject = {
+							'display': 'block'
+						}
+						this.progress = '100%';
+						this.speedBtn = '停止加速'
+						this.net_delay = this.randomNum(4, 48)
+						this.loss = this.randomNum(2, 9)
+						this.faster = this.randomNum(80, 99)
+
+						console.log("start interval:" + this.remaining)
+
+						this.clock = setInterval(() => {
+							console.log("this.remaining in interval:" + this.remaining)
+							this.remaining--
+
+							if (this.remaining <= 0) {
+								this.stopAll()
+								uni.showModal({
+									title: "提示",
+									content: '会员时长不足，请先购买订阅',
+									showCancel: false,
+									confirmText: "知道了",
+									complete: () => {
+										// uni.reLaunch({
+										// 	url: '/pages/speednet-membership/memberCenter'
+										// })
+									}
+								});
+								clearInterval(this.clock)
+							}
+						}, 60000)
+					}
 				}
-				this.smLoadingCssObject = {
-					'sm-loading-css': false,
-					'sm-loading-css-run': true
-				}
-				this.smSmStyleObject = {
-					'backgroundImage': '',
-				}
-				this.smTextStyleObject = {
-					'display': 'block'
-				}
-				this.progress = '100%';
-				this.speedBtn = '停止加速'
-				this.net_delay = this.randomNum(4, 48)
-				this.loss = this.randomNum(2, 9)
-				this.faster = this.randomNum(80, 99)
 			},
-			setStopStatus() {
+			setViewStopStatus() {
 				this.speedBtn = '启动加速'
 				this.loadingCssObject = {
 					'loading-css-run': false,

@@ -21,7 +21,7 @@
 				<!-- 通过body插槽定义布局 -->
 				<template v-slot:body class="slot-box">
 					<view class="main">
-						<text class="title">{{item.game}}</text>
+						<text class="title">{{item.gameName}}</text>
 						<view class="info">
 							<!-- <text class="author">{{item.user_id[0]?item.user_id[0].username:''}}</text> -->
 							<uni-dateformat class="last_modify_date" :date="item.start_date" format="yyyy-MM-dd"
@@ -44,6 +44,7 @@
 		mapGetters,
 		mapMutations
 	} from 'vuex';
+	import store from '@/store'
 	var cdbRef, currentWebview;
 	import statusBar from "@/uni_modules/uni-nav-bar/components/uni-nav-bar/uni-status-bar";
 
@@ -53,14 +54,8 @@
 		computed: {
 			...mapGetters({
 				speedInfo: 'user/speedInfo',
+				globalSpeedStatus: 'user/globalSpeedStatus'
 			}),
-			hasStarted() {
-				if (this.speedInfo && this.speedInfo.hasStarted) {
-					return this.speedInfo.hasStarted
-				} else {
-					return false
-				}
-			},
 			appVersion() {
 				return getApp().appVersion
 			},
@@ -86,8 +81,8 @@
 			},
 			mySpeedList: {
 				get() {
-					console.log('this.speedInfo', this.speedInfo);
-					console.log('tthis.speedInfo.mySpeedList', this.speedInfo.mySpeedList);
+					console.log('this.speedInfo', JSON.stringify(this.speedInfo));
+					console.log('tthis.speedInfo.mySpeedList', JSON.stringify(this.speedInfo.mySpeedList));
 					if (this.speedInfo && this.speedInfo.mySpeedList) {
 						return this.speedInfo.mySpeedList
 					} else {
@@ -102,7 +97,7 @@
 		},
 		onTabItemTap(e) {
 			console.log('-------------------------onTabItemTap')
-			if (this.speedInfo.hasStarted) {
+			if (this.getRativeStatus() == "running") {
 				var running = this.speedInfo.runningGame
 				console.log(JSON.stringify(running))
 				uni.navigateTo({
@@ -135,7 +130,7 @@
 		},
 		onLoad(e) {
 			let currentRoute = this.$mp.page.route; // 获取当前页面路由
-			if (this.speedInfo.hasStarted) {
+			if (this.getRativeStatus() == "running") {
 				var running = this.speedInfo.runningGame
 				console.log(JSON.stringify(running))
 				uni.navigateTo({
@@ -147,9 +142,9 @@
 				})
 			}
 		},
+
 		onShow() {
-			console.log('onshow.speedInfo', this.speedInfo.hasStarted);
-			if (this.speedInfo.hasStarted) {
+			if (this.getRativeStatus() == "running") {
 				var running = this.speedInfo.runningGame
 				console.log(JSON.stringify(running))
 				uni.navigateTo({
@@ -163,8 +158,7 @@
 			}
 		},
 		onBackPress() {
-			console.log('onBackPress.speedInfo', this.speedInfo.hasStarted);
-			if (this.speedInfo.hasStarted) {
+			if (this.getRativeStatus() == "running") {
 				var running = this.speedInfo.runningGame
 				console.log(JSON.stringify(running))
 				uni.navigateTo({
@@ -194,6 +188,27 @@
 			getApp().globalData.searchText = ''
 		},
 		methods: {
+			getRativeStatus() { // 获取真实VPN状态
+				uni.sendNativeEvent("status", "event", function(e) {
+					// uni.showModal({
+					// 	title: "e",
+					// 	content: e,
+					// 	showCancel: false,
+					// 	confirmText: "知道了",
+					// });
+					if (e == 'running') {
+						uni.setStorageSync('globalSpeedStatus', "running")
+					} else {
+						uni.setStorageSync('globalSpeedStatus', "stoped")
+					}
+					// var toastTitle = "sync:" + uni.getStorageSync('globalSpeedStatus')
+					// uni.showToast({
+					// 	title: toastTitle,
+					// 	icon: 'error',
+					// });
+				})
+				return uni.getStorageSync('globalSpeedStatus')
+			},
 			mySpeedList() {
 				console.log('this.speedInfo', this.speedInfo);
 				console.log('tthis.speedInfo.mySpeedList', this.speedInfo.mySpeedList);

@@ -312,11 +312,15 @@
 				});
 			},
 			getHourMinite(minites) {
+				if (minites < 0) {
+					minites = 0
+				}
 				return Math.floor(minites / 60) + '小时' + (minites % 60) + '分'
 			},
 			async getMembership() {
 				const membership = uniCloud.importObject('membership')
 				var myship = await membership.getMembership(this.userInfo._id)
+				console.log("membership" + JSON.stringify(myship))
 				if (myship == "") {
 					this.my_remaining_minites = '0分钟'
 					this.my_is_pause = '暂停'
@@ -329,11 +333,12 @@
 						this.my_remaining_minites = this.getHourMinite(myship.remaining_minites)
 						this.my_start_time = this.shijianfilter(myship.start_time)
 					} else {
-						var now = new Date().getTime()
-						var reverse = Date.parse(myship.reverse_date)
-						var sub = now - reverse
-						var my_time = Math.floor(sub / (60 * 1000))
-						var remaining = myship.remaining_minites - my_time
+						// var now = new Date().getTime()
+						// var reverse = Date.parse(myship.reverse_date)
+						// var sub = now - reverse
+						// var my_time = Math.floor(sub / (60 * 1000))
+						// var remaining = myship.remaining_minites - my_time
+						var remaining = myship.remaining_minites
 						this.my_start_time = this.shijianfilter(myship.start_time)
 						if (remaining <= 0) {
 							this.my_remaining_minites = '0分钟'
@@ -342,6 +347,9 @@
 							let clock = window.setInterval(() => {
 								remaining--
 								this.my_remaining_minites = this.getHourMinite(remaining)
+								if (remaining == 0) {
+									clock.clear()
+								}
 							}, 60000)
 						}
 					}
@@ -396,7 +404,8 @@
 					mask: true
 				})
 				const membership = uniCloud.importObject('membership')
-				let subscribe = await membership.subscribe(this.userInfo._id, this.rechargeOptions[this.current].hours)
+				let subscribe = await membership.subscribe(this.userInfo._id, this.userInfo.nickname || this.userInfo
+					.username, this.rechargeOptions[this.current].price, this.rechargeOptions[this.current].hours)
 				uni.hideLoading()
 				let msg = '';
 				msg = subscribe ? `成功订阅「${this.rechargeOptions[this.current].hours}小时」` : `订阅失败`;
