@@ -3,13 +3,14 @@
 		<!-- 登录框 (选择手机号所属国家和地区需要另行实现) -->
 		<uni-easyinput clearable focus type="number" class="input-box" :inputBorder="false" v-model="formData.phone"
 			maxlength="11" :placeholder="$t('common.phonePlaceholder')"></uni-easyinput>
-		<uni-easyinput clearable type="number" class="input-box" :inputBorder="false" v-model="formData.code" maxlength="6"
-			:placeholder="$t('common.verifyCodePlaceholder')">
+		<uni-easyinput clearable type="number" class="input-box" :inputBorder="false" v-model="formData.code"
+			maxlength="6" :placeholder="$t('common.verifyCodePlaceholder')">
 			<template v-slot:right>
 				<uni-send-sms-code ref="shortCode" code-type="bind" :phone="formData.phone"></uni-send-sms-code>
 			</template>
 		</uni-easyinput>
-		<button class="send-btn-box" :disabled="!canSubmit" :type="canSubmit?'primary':'default'" @click="submit">{{$t('common.submit')}}</button>
+		<button class="send-btn-box" :disabled="!canSubmit" :type="canSubmit?'primary':'default'"
+			@click="submit">{{$t('common.submit')}}</button>
 	</view>
 </template>
 <script>
@@ -22,26 +23,26 @@
 			return {
 				currenPhoneArea: '',
 				formData: {
-					phone:"",
-					code:""
+					phone: "",
+					code: ""
 				}
 			}
 		},
 		computed: {
 			tipText() {
-				return this.$t('common.verifyCodeSend')+ `${this.currenPhoneArea} ${this.formData.phone}。` + this.$t('common.passwordDigits')
+				return this.$t('common.verifyCodeSend') + `${this.currenPhoneArea} ${this.formData.phone}。` + this.$t(
+					'common.passwordDigits')
 			},
 			canSubmit() {
-				return true//this.isPhone() && this.isCode();
+				return true //this.isPhone() && this.isCode();
 			}
 		},
 		onLoad(event) {
 			uni.setNavigationBarTitle({
-				title:this.$t('bindMobile.navigationBarTitle')
+				title: this.$t('bindMobile.navigationBarTitle')
 			})
 		},
-		onReady() {
-		},
+		onReady() {},
 		methods: {
 			...mapMutations({
 				setUserInfo: 'user/login'
@@ -52,23 +53,30 @@
 			submit() {
 				console.log(this.formData);
 				uniCloud.callFunction({
-					name:'uni-id-cf',
-					data:{
-						action:'bindMobileBySms',
-						params:{
+					name: 'uni-id-cf',
+					data: {
+						action: 'bindMobileBySms',
+						params: {
 							"mobile": this.formData.phone,
 							"code": this.formData.code
 						},
 					},
-					success: ({result}) => {
+					success: ({
+						result
+					}) => {
 						console.log(result);
-						this.setUserInfo({"mobile":result.mobile})
+						this.setUserInfo({
+							"mobile": result.mobile
+						})
 						uni.showToast({
-							title: result.msg||'完成',
+							title: result.msg || '完成',
 							icon: 'none'
 						});
 						if (result.code === 0) {
-							uni.navigateBack()
+							uni.reLaunch({
+								url: '/pages/speednet-membership/memberCenter'
+							})
+							// uni.navigateBack()
 						}
 					}
 				})
@@ -94,11 +102,13 @@
 		padding: 50rpx;
 		padding-top: 10px;
 	}
-/* #ifndef APP-NVUE  || VUE3 */
+
+	/* #ifndef APP-NVUE  || VUE3 */
 	.box /deep/ .uni-easyinput__content {
 		height: 50px;
 	}
-/* #endif */
+
+	/* #endif */
 	.input-box {
 		width: 100%;
 		margin-top: 16px;

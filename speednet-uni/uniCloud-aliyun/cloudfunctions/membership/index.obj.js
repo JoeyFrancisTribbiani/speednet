@@ -52,6 +52,10 @@ module.exports = {
 
 			console.log(addres);
 			if (addres) {
+				var uid = addres.id
+				var user = await db.collection("uni-id-users").doc(userId).update({
+					membership: uid
+				})
 				var record = await db.collection("speednet-money-record").add({
 					user_id: userId,
 					user_name: userName,

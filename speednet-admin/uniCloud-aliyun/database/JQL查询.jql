@@ -11,9 +11,17 @@
 // 下面示例查询uni-id-users表的所有数据
 db.collection('speednet-peer').get();
 db.collection('speednet-game-region').get();
-db.collection('speednet-peer','speednet-game-region').get();
-db.collection('uni-id-roles').get();
-db.collection('uni-id-users').field('username','role').get();
+db.collection('speednet-peer', 'speednet-game-region').get();
+db.collection('speednet-membership,uni-id-users').get();
+db.collection('uni-id-users').get();
 db.collection('uni-id-users').where({
-				role: 'admin'
-			}).get()
+	role: 'admin'
+}).get();
+db.collection('uni-id-users').where({
+	_id: '626b25f0eb12470001c5f463'
+}).remove();
+db.collection('speednet-membership').get();
+db.collection("speednet-membership").doc('626d0961a8598000011c2140').update({
+	remaining_minites: 20,
+	is_pause: 1
+})

@@ -16,7 +16,7 @@
 			<text class="link" @click="toRetrievePwd">{{$t('pwdLogin.forgetPassword')}}</text>
 			<text class="link" @click="toRegister">{{$t('pwdLogin.register')}}</text>
 		</view>
-		<uni-quick-login :agree="agree" ref="uniQuickLogin"></uni-quick-login>
+		<!-- <uni-quick-login :agree="agree" ref="uniQuickLogin"></uni-quick-login> -->
 	</view>
 </template>
 
@@ -47,6 +47,12 @@
 		methods: {
 			// 页面跳转，找回密码
 			toRetrievePwd() {
+				uni.navigateTo({
+					url: '../pwd-retrieve/pwd-retrieve?phoneNumber=' + (this.isPhone ? this.username : '') +
+						'&phoneArea=' + this.currenPhoneArea
+				})
+			},
+			toMySpeed() {
 				uni.navigateTo({
 					url: '../pwd-retrieve/pwd-retrieve?phoneNumber=' + (this.isPhone ? this.username : '') +
 						'&phoneArea=' + this.currenPhoneArea
@@ -121,7 +127,7 @@
 			toRegister(e) {
 				console.log(e);
 				uni.navigateTo({
-					url: '/pages/ucenter/login-page/register/register'
+					url: '/pages/ucenter/login-page/register/phone-number'
 				})
 			}
 		}

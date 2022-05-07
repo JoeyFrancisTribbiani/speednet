@@ -124,6 +124,12 @@
 				"write": false
 			}
 		},
+		"membership": {
+			"bsonType": "string",
+			"title": "用户订阅",
+			"foreignKey": "speednet-membership._id",
+			"description": "用户订阅"
+		},
 		"dcloud_appid": {
 			"bsonType": "array",
 			"title": "可登陆应用appid",

@@ -1,7 +1,7 @@
 <template>
-	<scroll-view style="padding: 15px;box-sizing: border-box;">
-		{{ $t("index.text.prompt") }}
-		<text style="color: #666; font-size: 15px;">（ v{{adminVersion}}, {{ $t("index.text.vesion") }}）</text>
+	<scroll-view style="padding: 15px;box-sizing: border-box;text-align: center;">
+		<!-- {{ $t("index.text.prompt") }} -->
+		<text style="color: #666; font-size: 15px;">新起点网游加速器管理后台</text>
 		<!-- #ifndef H5 -->
 		<fix-window />
 		<!-- #endif -->

@@ -88,7 +88,7 @@
 				if (uni.getStorageSync('CURRENT_LANG') == "en") {
 					return 'Please enter the search content'
 				} else {
-					return '请输入搜索内容'
+					return '请输入游戏名字'
 				}
 			},
 			colList() {

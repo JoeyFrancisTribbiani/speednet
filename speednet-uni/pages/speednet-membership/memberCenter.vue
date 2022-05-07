@@ -128,6 +128,12 @@
 	const statusBarHeight = uni.getSystemInfoSync().statusBarHeight
 
 	export default {
+		onTabItemTap(e) {
+			console.log('-------------------------onTabItemTap')
+			uni.reLaunch({
+				url: '/pages/speednet-membership/memberCenter'
+			})
+		},
 		filters: {
 			timeFilter(value) {
 				return parseFloat(value).toFixed(2)
@@ -173,13 +179,34 @@
 				}
 			}
 		},
-		onLoad() {},
+		onLoad() {
+			console.log("onLoad:" + JSON.stringify(this.userInfo));
+		},
 		onReady() {
+
 			db.collection("speednet-member-plan").get()
 				.then((res) => {
 					this.$data.rechargeOptions = res.result.data
 				})
 			this.getMembership()
+		},
+		onShow() {
+			if (!this.userInfo.username) {
+				console.log("if (this.userInfo):" + this.userInfo);
+				return
+			}
+			if (!this.userInfo.mobile) {
+				console.log("!this.userInfo.mobile:" + JSON.stringify(this.userInfo));
+				uni.showModal({
+					content: '请绑定手机！',
+					showCancel: false,
+					complete: () => {
+						uni.reLaunch({
+							url: '/pages/ucenter/userinfo/bind-mobile/bind-mobile'
+						})
+					}
+				});
+			}
 		},
 		data() {
 			return {
@@ -344,7 +371,7 @@
 							this.my_remaining_minites = '0分钟'
 						} else {
 							this.my_remaining_minites = this.getHourMinite(remaining)
-							let clock = window.setInterval(() => {
+							let clock = setInterval(() => {
 								remaining--
 								this.my_remaining_minites = this.getHourMinite(remaining)
 								if (remaining == 0) {

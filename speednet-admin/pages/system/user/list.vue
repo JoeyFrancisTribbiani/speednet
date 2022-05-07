@@ -25,11 +25,12 @@
 			</view>
 		</view>
 		<view class="uni-container">
-			<unicloud-db ref="udb" collection="uni-id-users,uni-id-roles"
-				field="username,mobile,status,email,role{role_name},dcloud_appid,tags,register_date" :where="where"
+			<unicloud-db ref="udb" collection="uni-id-users, speednet-membership"
+				field="username,mobile,status,email,cloud_appid,tags,register_date,membership" :where="where"
 				page-data="replace" :orderby="orderby" :getcount="true" :page-size="options.pageSize"
 				:page-current="options.pageCurrent" v-slot:default="{data,pagination,loading,error,options}"
-				:options="options" loadtime="manual" @load="onqueryload">
+				:options="options" loadtime="manual">
+				<!-- 		@load="onqueryload" -->
 				<uni-table ref="table" :loading="loading" :emptyText="error.message || $t('common.empty')" border stripe
 					type="selection" @selection-change="selectionChange">
 					<uni-tr>
@@ -39,12 +40,9 @@
 							sortable @sort-change="sortChange($event, 'mobile')">手机号码</uni-th>
 						<uni-th align="center" filter-type="select" :filter-data="options.filterData.status_localdata"
 							@filter-change="filterChange($event, 'status')">用户状态</uni-th>
-						<!-- 						<uni-th align="center" filter-type="search" @filter-change="filterChange($event, 'email')"
-							sortable @sort-change="sortChange($event, 'email')">邮箱</uni-th> -->
-						<!-- <uni-th align="center">角色</uni-th> -->
 						<uni-th align="center" filter-type="select" :filter-data="tagsData"
 							@filter-change="filterChange($event, 'tags')">用户标签</uni-th>
-						<!-- <uni-th align="center">可登录应用</uni-th> -->
+						<uni-th align="center">剩余时长</uni-th>
 						<uni-th align="center" filter-type="timestamp"
 							@filter-change="filterChange($event, 'register_date')" sortable
 							@sort-change="sortChange($event, 'register_date')">注册时间</uni-th>
@@ -53,11 +51,7 @@
 					<uni-tr v-for="(item,index) in data" :key="index">
 						<uni-td align="center">{{item.username}}</uni-td>
 						<uni-td align="center">{{item.mobile}}</uni-td>
-						<uni-td align="center">{{options.status_valuetotext[item.status]}}</uni-td>
-						<!-- 						<uni-td align="center">
-							<uni-link :href="'mailto:'+item.email" :text="item.email"></uni-link>
-						</uni-td> -->
-						<!-- <uni-td align="center">{{item.role}}</uni-td> -->
+						<uni-td align="center">{{options.status_valuetotext[item.status] || '正常'}}</uni-td>
 						<uni-td align="center">
 							<template v-if="item.dcloud_appid === '__UNI__40A1BE1'" v-for="tag in ['后台管理员']">
 								<uni-tag type="primary" inverted size="small" :text="tag" style="margin: 0 5px;">
@@ -68,12 +62,7 @@
 								</uni-tag>
 							</template>
 						</uni-td>
-						<!-- 						<uni-td align="center">
-							<uni-link v-if="item.dcloud_appid === undefined" :href="noAppidWhatShouldIDoLink">
-								未绑定可登录应用<view class="uni-icons-help"></view>
-							</uni-link>
-							{{item.dcloud_appid}}
-						</uni-td> -->
+						<uni-td align="center">{{item.membership[0] | remaining }}</uni-td>
 						<uni-td align="center">
 							<uni-dateformat :threshold="[0, 0]" :date="item.register_date"></uni-dateformat>
 						</uni-td>
@@ -241,6 +230,23 @@
 					dynamic_data.push(tag)
 				}
 				return dynamic_data
+			}
+		},
+		filters: {
+			remaining: function(myship) {
+				if (!myship) return ''
+				var current_remaining = myship.remaining_minites
+				if (!myship.is_pause) {
+					var now = new Date().getTime()
+					var reverse = Date.parse(myship.reverse_date)
+					var sub = now - reverse
+					var my_time = Math.floor(sub / (60 * 1000))
+					current_remaining = myship.remaining_minites - my_time
+				}
+				if (current_remaining < 0) {
+					current_remaining = 0
+				}
+				return Math.floor(current_remaining / 60) + '小时' + (current_remaining % 60) + '分'
 			}
 		},
 		methods: {

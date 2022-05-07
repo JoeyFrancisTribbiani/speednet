@@ -284,6 +284,10 @@
 							this.setSpeedInfoStorage()
 							uni.setStorageSync('globalSpeedStatus', "running")
 							this.setViewStartedStatus()
+							uni.showToast({
+								title: "启动成功",
+								icon: 'error',
+							});
 						}
 					}
 				} else {
@@ -408,6 +412,7 @@
 							'display': 'block'
 						}
 						this.progress = '100%';
+
 						this.speedBtn = '停止加速'
 						this.net_delay = this.randomNum(4, 48)
 						this.loss = this.randomNum(2, 9)

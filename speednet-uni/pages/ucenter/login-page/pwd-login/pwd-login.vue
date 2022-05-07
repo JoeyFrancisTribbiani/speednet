@@ -2,11 +2,13 @@
 	<view class="content">
 		<!-- 顶部文字 -->
 		<text class="title">{{$t('pwdLogin.pwdLogin')}}</text>
-		<input class="input-box" :inputBorder="false" v-model="username" :placeholder="$t('pwdLogin.placeholder')"/>
-		<input type="password" class="input-box" :inputBorder="false" v-model="password" :placeholder="$t('pwdLogin.passwordPlaceholder')"/>
+		<input class="input-box" :inputBorder="false" v-model="username" :placeholder="$t('pwdLogin.placeholder')" />
+		<input type="password" class="input-box" :inputBorder="false" v-model="password"
+			:placeholder="$t('pwdLogin.passwordPlaceholder')" />
 		<view class="captcha-box" v-if="captchaBase64">
 			<image class="captcha-img" @click="createCaptcha" :src="captchaBase64" mode="widthFix"></image>
-			<input type="text" class="input-box captcha" :inputBorder="false" v-model="captcha" :placeholder="$t('pwdLogin.verifyCodePlaceholder')"/>
+			<input type="text" class="input-box captcha" :inputBorder="false" v-model="captcha"
+				:placeholder="$t('pwdLogin.verifyCodePlaceholder')" />
 		</view>
 		<uni-agreements @setAgree="agree = $event"></uni-agreements>
 		<button class="send-btn" :disabled="!canLogin" :type="canLogin?'primary':'default'"
@@ -29,8 +31,8 @@
 				"password": "",
 				"username": "",
 				"agree": false,
-				"captchaBase64":"",
-				"captcha":""
+				"captchaBase64": "",
+				"captcha": ""
 			}
 		},
 		computed: {
@@ -52,12 +54,6 @@
 						'&phoneArea=' + this.currenPhoneArea
 				})
 			},
-			toMySpeed() {
-				uni.navigateTo({
-					url: '../pwd-retrieve/pwd-retrieve?phoneNumber=' + (this.isPhone ? this.username : '') +
-						'&phoneArea=' + this.currenPhoneArea
-				})
-			},
 			/**
 			 * 密码登录
 			 */
@@ -70,27 +66,29 @@
 				}
 				// 下边是可以登录
 				uniCloud.callFunction({
-					name:'uni-id-cf',
-					data:{
-						action:'login',
-						params:{
+					name: 'uni-id-cf',
+					data: {
+						action: 'login',
+						params: {
 							"username": this.username,
 							"password": this.password,
-							"captcha":this.captcha
+							"captcha": this.captcha
 						},
 					},
-					success: ({result}) => {
+					success: ({
+						result
+					}) => {
 						console.log(result);
 						if (result.code === 0) {
 							this.loginSuccess(result)
 						} else {
 							if (result.needCaptcha) {
 								uni.showToast({
-									title: result.msg||'完成',
+									title: result.msg || '完成',
 									icon: 'none'
 								});
 								this.createCaptcha()
-							}else{
+							} else {
 								uni.showModal({
 									title: this.$t('common').error,
 									content: result.msg,
@@ -102,19 +100,21 @@
 					}
 				})
 			},
-			createCaptcha(){
+			createCaptcha() {
 				uniCloud.callFunction({
-					name:'uni-id-cf',
-					data:{
-						action:'createCaptcha',
-						params:{
+					name: 'uni-id-cf',
+					data: {
+						action: 'createCaptcha',
+						params: {
 							scene: "login"
 						},
 					},
-					success: ({result}) => {
+					success: ({
+						result
+					}) => {
 						if (result.code === 0) {
 							this.captchaBase64 = result.captchaBase64
-						}else{
+						} else {
 							uni.showModal({
 								content: result.msg,
 								showCancel: false
@@ -127,7 +127,7 @@
 			toRegister(e) {
 				console.log(e);
 				uni.navigateTo({
-					url: '/pages/ucenter/login-page/register/phone-number'
+					url: '/pages/ucenter/login-page/register/register'
 				})
 			}
 		}
@@ -155,16 +155,19 @@
 		margin-top: 80px;
 		width: 600rpx;
 	}
-	.captcha-box{
+
+	.captcha-box {
 		flex-direction: row;
 		align-items: center;
 		justify-content: flex-end;
 	}
-	.captcha-img{
+
+	.captcha-img {
 		margin: 0 15px 10px 0;
 		width: 250rpx;
 	}
-	.captcha{
+
+	.captcha {
 		width: 350rpx;
 	}
 </style>

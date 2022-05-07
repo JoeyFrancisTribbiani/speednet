@@ -1,16 +1,19 @@
-import {mapMutations} from 'vuex';
+import {
+	mapMutations
+} from 'vuex';
 import loginSuccess from './loginSuccess.js';
 let mixin = {
-	methods:{
+	methods: {
 		...mapMutations({
 			setUserInfo: 'user/login'
 		}),
-		loginSuccess(result){
+		loginSuccess(result) {
 			loginSuccess(result)
 			delete result.userInfo.token
 			if (result.type == "register") {
-				result.userInfo._id = result.uid  
+				result.userInfo._id = result.uid
 			}
+			console.log("userinfo:-------------" + result.userInfo)
 			this.setUserInfo(result.userInfo)
 		}
 	}
