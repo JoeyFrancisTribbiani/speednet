@@ -68,7 +68,7 @@ check_crontab_installed_status() {
     fi
 }
 check_pid() {
-    PID=$(ps -ef | grep "transfer relays" | grep -v grep | grep -v ".sh" | grep -v "init.d" | grep -v "service" | awk '{print $2}')
+    PID=$(ps -ef | grep "transfer relay" | grep -v grep | grep -v ".sh" | grep -v "init.d" | grep -v "service" | awk '{print $2}')
 }
 check_new_ver() {
     echo -e "请输入要下载安装的 transfer 版本号 ${Green_font_prefix}[ 格式是日期，例如: v20180909 ]${Font_color_suffix}
@@ -116,14 +116,14 @@ Download_transfer() {
 }
 Service_transfer() {
     if [[ ${release} = "centos" ]]; then
-        if ! wget --no-check-certificate https://raw.githubusercontent.com/JoeyFrancisTribbiani/speednet/master/brook-pf.sh -O /etc/init.d/transfer-pf; then
+        if ! wget --no-check-certificate https://raw.githubusercontent.com/JoeyFrancisTribbiani/speednet/master/transfer-pf.sh -O /etc/init.d/transfer-pf; then
             echo -e "${Error} transfer服务 管理脚本下载失败 !" && exit 1
         fi
         chmod +x /etc/init.d/transfer-pf
         chkconfig --add transfer-pf
         chkconfig transfer-pf on
     else
-        if ! wget --no-check-certificate https://raw.githubusercontent.com/JoeyFrancisTribbiani/speednet/master/brook-pf.sh -O /etc/init.d/transfer-pf; then
+        if ! wget --no-check-certificate https://raw.githubusercontent.com/JoeyFrancisTribbiani/speednet/master/transfer-pf.sh -O /etc/init.d/transfer-pf; then
             echo -e "${Error} transfer服务 管理脚本下载失败 !" && exit 1
         fi
         chmod +x /etc/init.d/transfer-pf
