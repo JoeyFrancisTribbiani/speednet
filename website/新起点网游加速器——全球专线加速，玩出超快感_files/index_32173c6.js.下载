@@ -1,0 +1,281 @@
+nie.define("Index", function () {
+
+    'use strict';
+
+    //判断是否是mac
+    function OSnow() {
+        var agent = navigator.userAgent.toLowerCase();
+        var isMac = /macintosh|mac os x/i.test(navigator.userAgent);
+        // isMac = true;
+        if (agent.indexOf("win32") >= 0 || agent.indexOf("wow32") >= 0) {
+            // alert("这是windows32位系统");
+            $('.mac_banner').remove()
+            $('.win_banner').removeClass('hide')
+            // console.log("win32");
+            return false;
+        }
+        if (agent.indexOf("win64") >= 0 || agent.indexOf("wow64") >= 0) {
+            // alert("这是windows64位系统");
+            $('.mac_banner').remove()
+            $('.win_banner').removeClass('hide')
+            // console.log("win64");
+            return false;
+        }
+        if (isMac) {
+            $('.win_banner').remove()
+            $('.mac_banner').removeClass('hide')
+            // console.log("isMac");
+            return false;
+        } else {
+            $('.mac_banner').remove()
+            $('.win_banner').removeClass('hide')
+            // console.log("啥也不是");
+            return false;
+        }
+    }
+    OSnow();
+    $('.banner .swiper-container').addClass('on');
+    //需要动态修改分享内容的，要把组件返回的对象定义在外部
+    var shareV5 = nie.require("nie.util.shareV5");
+
+    var getDlData = function () {
+        window.getDlUrl = function (n) {
+            n && n.dlUrl && $(".down-pc a").attr("href", n.dlUrl),
+                n && n.dlUrl && $(".bbxz_content li:first a").attr("href", n.dlUrl),
+                n && n.dlUrl && $(".down-pc1 a").not('.check').attr("href", n.dlUrl),
+                // n && n.standbyDlUrl && $(".load-down2 a").attr("href", n.standbyDlUrl),
+                n && n.androidDlUrl && $(".right-download-slide .btn-and").attr("href", n.androidDlUrl)
+            n && n.androidDlUrl && $(".andr_btn").attr("href", n.androidDlUrl)
+        };
+        var n = "//uu.163.com/baike/js/dl.js";
+        $.ajax({
+            url: n,
+            type: "GET",
+            dataType: "jsonp",
+            jsonp: "callback",
+            jsonpCallback: "getDlUrl"
+        }).success(function () { }).fail(function () {
+            console && console.log("error")
+        }),
+            $(".down-pc a,.bbxz_content li:first a,.down-pc1 a").not('.check').click(function () {
+                // var n = $("<iframe></iframe>");
+                // return n.attr("width", 0),
+                // n.attr("height", 0),
+                // n.attr("src", $(".down-pc a").attr("href")),
+                // n.appendTo("body"),
+                // !1
+            }),
+            //下载点击事件统计
+            $("#ckgDown").click(function () {
+                _hmt.push(["_trackEvent", "ckgDown", "download", "PC"])
+            }),
+            $("#wdjscjkgDown").click(function () {
+                _hmt.push(["_trackEvent", "wdjscjkgDown", "download", "PC"])
+            }),
+            $("#zyjlwxkgDown").click(function () {
+                _hmt.push(["_trackEvent", "zyjlwxkgDown", "download", "PC"])
+            }),
+            $("#ygzhdckgDown").click(function () {
+                _hmt.push(["_trackEvent", "ygzhdckgDown", "download", "PC"])
+            }),
+            $("#qkyxqmkgDown").click(function () {
+                _hmt.push(["_trackEvent", "qkyxqmkgDown", "download", "PC"])
+            }),
+            $("#bbxzDown").click(function () {
+                _hmt.push(["_trackEvent", "bbxzDown", "download", "PC"])
+            })
+        //安卓下载统计
+        $("#andDown").click(function () {
+            _hmt.push(["_trackEvent", "andDown", "download", "android"])
+        }),
+            //IOS下载统计
+            $("#iosDown").click(function () {
+                _hmt.push(["_trackEvent", "iosDown", "download", "ios"])
+            })
+        //mac下载统计
+        $("#macDown").click(function () {
+            _hmt.push(["_trackEvent", "macDown", "download", "mac"])
+        })
+        //mac子页下载统计
+        // $("#macDown_ziye").click(function() {
+        //     _hmt.push(["_trackEvent", "macDown_ziye", "download","macDown_ziye"])
+        // })
+    }
+
+    //替换当前分享链接
+    var urlx = '';
+    if ($("#share_url").text() != null) {
+        urlx = $("#share_url").text();
+    } else {
+        urlx = window.location.href;
+    }
+    var share_top = shareV5({
+        fat: "#share_top",//分享组件插入父级（dom或选择器），默认："#NIE-share"
+        type: 2,//分享组件类别，默认:1（1：小icon，2：大icon，3：右侧滚动条分享，4：图片分享，5：文本分享，6：带文字的小icon）
+        defShow: [23, 2, 1],//默认展示的分享按钮 
+        title: $("#share_title").text(),//分享的标题,默认：当前页面的title
+        url: urlx,//分享的链接，默认：当前页面的url
+        img: $("#share_pic").attr('data-src'),//分享的图片，默认：null
+        content: $("#share_desc").text(),//分享的正文内容，只有部分平台支持。默认：当前页面的title
+        //product:"产品号" //选填，自适应163.com域名的产品，论坛需要指定（论坛指定规范：天下贰论坛 product="tx2_bbs"）
+    });
+    $('#share_top').addClass('on');
+    var share_bottom = shareV5({
+        fat: "#share_bottom",//分享组件插入父级（dom或选择器），默认："#NIE-share"
+        type: 2,//分享组件类别，默认:1（1：小icon，2：大icon，3：右侧滚动条分享，4：图片分享，5：文本分享，6：带文字的小icon）
+        defShow: [23, 2, 1, 29],//默认展示的分享按钮 
+        title: $("#share_title").text(),//分享的标题,默认：当前页面的title
+        img: $("#share_pic").attr('data-src'),//分享的图片，默认：null
+        content: $("#share_desc").text(),//分享的正文内容，只有部分平台支持。默认：当前页面的title
+        //product:"产品号" //选填，自适应163.com域名的产品，论坛需要指定（论坛指定规范：天下贰论坛 product="tx2_bbs"）
+    });
+
+    $(".thcz .right-width").width($(".thcz .left").width());
+
+    $(".thcz .left").hover(function () {
+        $(".thcz").addClass('active');
+    }, function () {
+        $(".thcz").removeClass('active');
+    })
+    $(".thcz .right").hover(function () {
+        $(".thcz").addClass('active_2');
+    }, function () {
+        $(".thcz").removeClass('active_2');
+    })
+
+    // 返回顶部
+    $("#to_top").click(function () {
+        $("body,html").stop().animate({ scrollTop: 0 }, 500)
+    })
+
+    var mySwiper_rmyx = new Swiper('.swiper-container-rmyx', {
+        autoplay: 5000,
+        loop: true,
+        pagination: '.rmyx-pagination',
+        effect: 'coverflow',
+        paginationClickable: true,
+        centeredSlides: true,
+        autoplayDisableOnInteraction: false,
+        nextButton: '.rmyx-next',
+        prevButton: '.rmyx-prev',
+        slidesPerView: 'auto',
+        coverflow: {
+            rotate: 0,// 旋转的角度
+            stretch: 49,// 拉伸   图片间左右的间距和密集度
+            depth: 100,// 深度   切换图片间上下的间距和密集度
+            modifier: 3,// 修正值 该值越大前面的效果越明显
+            slideShadows: false// 页面阴影效果
+        },
+    });
+
+    var swiper11 = new Swiper('.swiper-container2', {
+
+        effect: 'fade',
+        loop: true,
+        nested: true,
+        autoplay: 4000,
+        paginationClickable: true,
+        pagination: '.swiper-pagination',
+        nextButton: '.swiper-button-next',
+        prevButton: '.swiper-button-prev',
+    });
+
+    var mySwiper_rmhd = new Swiper('.swiper-container-rmhd', {
+        loop: true,
+        slidesPerView: 3,
+        paginationClickable: true,
+        pagination: '.rmhd-pagination',
+        nextButton: '.rmhd-next',
+        prevButton: '.rmhd-prev',
+    });
+
+    //android
+    var mySwiper_andr = new Swiper('.andr_swi', {
+        prevButton: '.andr_prev',
+        nextButton: '.andr_next',
+        effect: 'fade'
+    })
+
+    // ios
+    var mySwiper_ios = new Swiper('.ios_swi', {
+        prevButton: '.ios_prev',
+        nextButton: '.ios_next',
+        effect: 'fade'
+    })
+
+    getDlData();
+
+
+    //ADBase对象存在jquery的公共库，可以直接调用，一个页面只需要调用一次
+    ADBase.config({
+        pos: 'UUjiasuqi-piaochuang-948120',//此为广告位的id，多个用`,`隔开
+        callback: function (flag, data) {
+            //如果flag是false，表示广告调用失败，直接返回就可以了，页面会自动变成一个加载失败的图片
+            if (flag == false) return false;
+            //这里直接用上面写好的pos值作为key去获取广告数据，多个pos，需要获取多次，每个pos值对应一个广告位的数据
+            var lunboItems = data['UUjiasuqi-piaochuang-948120'];
+
+            console.log(lunboItems)
+            //循环获取广告数据
+            var lunboHtml = '';
+            for (var i = 0; i < lunboItems.length; i++) {
+                var item = lunboItems[i];
+                //url为点击的跳转链接，title为标题，src为广告大图，thumbsrc为为广告的缩略小图(一般不会有)
+                lunboHtml += '<span class="gg_close" onclick="ggw()"></span><li><a href="' + item.url + '" title="' + item.title + '" target="_blank"><img src="' + item.src + '" /></a></li>';
+            }
+            $("#img-list").html(lunboHtml);
+            //处理图片轮播事件，以及增加分页等操作
+        }
+    });
+
+    // bobo163版权
+    function _copyRight() {
+        function returnText(text) {
+            return `
+            <style type="text/css">
+            .nie-copyright-new-inner{width:1024px;text-align:left;margin:0 auto;padding:15px 0 10px;font-size:12px;line-height:20px;}.nie-copyright-new-inner .nie-cn-logo{display:inline-block;vertical-align:middle;height:48px;min-width:300px}.nie-copyright-new-inner .nie-cn-logo a{display:inline-block;vertical-align:top;margin-top: 2px;}.nie-copyright-new-inner .nie-cn-logo a.a0 img{padding-right:0}.nie-copyright-new-inner .nie-cn-logo img{padding-right:15px;padding-top:5px;border: 0;vertical-align:middle;}.nie-copyright-new-inner .nie-cn-nav{display:inline-block;vertical-align:top;position:relative;z-index:1;}.nie-copyright-new-inner .nie-cn-nav i{font-style:normal}.nie-copyright-new-inner .nie-cn-nav i.nie-cn-nav-i2{height:28px;line-height:28px;text-align: left;}.nie-copyright-new-inner .nie-cn-nav a{text-decoration:none}.nie-copyright-new-inner .nie-cn-nav a:hover{text-decoration:underline}.nie-copyright-new-inner .nie-cn-nav .nie-cn-reportcenter{padding-left:18px;font-style: normal;}.nie-copyright-new-inner .nie-cn-nav a.nie-cn-guardianship{display:inline-block;color:#fff;background-color:#610000;position:absolute;z-index:2;right:0;height:26px;line-height:26px;padding:0 3px;top:21px}#NIE-copyRight a.nie-cn-guardianship{color:#fff;}.nie-copyright-new-inner .nie-cn-part2{padding-top:10px;line-height:24px}.nie-copyright-new-inner .nie-cn-part2 a{text-decoration:none;display:inline-block;vertical-align:top}.nie-copyright-new-inner .nie-cn-part2 a:hover{text-decoration:underline}.nie-copyright-new-inner .nie-cn-part2 span{display:inline-block;vertical-align:top;}.nie-cn-part2 a img{vertical-align: top}
+            </style>
+            
+            <div class="nie-copyright-new-inner">
+                <div class="nie-cn-part1">
+                    <span class="nie-cn-logo">
+                    <a class="a0" href="http://www.163.com" target="_blank"><img src="https://nie.res.netease.com/comm/NIE_copyRight/images/netease.2.png"></a><a class="a1" href="http://game.163.com" target="_blank"><img src="https://nie.res.netease.com/comm/NIE_copyRight/images/nie.2.png"></a>
+                    </span>
+                    <span class="nie-cn-nav">
+                        <i class="nie-cn-nav-i1">
+                        <a href="http://gb.corp.163.com/gb/about/overview.html" target="_blank">公司简介</a> - <a href="http://help.163.com/" target="_blank">客户服务</a> - <a href="http://gb.corp.163.com/gb/legal.html" target="_blank">网易集团隐私政策及儿童个人信息保护规则</a> - <a href="http://game.163.com/about/" target="_blank">网易游戏</a> - <a href="http://game.163.com/contact/" target="_blank">联系我们</a> - <a href="http://game.163.com/contact/business.html" target="_blank">商务合作</a> - <a href="http://hr.game.163.com/index.html" target="_blank">加入我们</a>
+                        </i>
+                        <br>
+                        <i class="nie-cn-nav-i2">
+                        网易公司版权所有 ©1997-2021
+                        </i>
+                        
+                    </span>
+                </div>
+                <div class="nie-cn-part2"><a href="http://www.beian.miit.gov.cn/state/outPortal/loginPortal.action" target="_blank">${text}</a><span style="display: block;">增值电信业务经营许可证：浙B2-20150144</span> </div>
+            </div>`;
+        }
+
+        var myHref = window.location.href;
+        if (myHref.indexOf("uu.bobo163.net") >= 0) {
+            $("#NIE-copyRight").html(returnText('ICP备案：浙ICP备15005366号-2'));
+        } else if (myHref.indexOf("uu.sowellwell.com") >= 0) {
+            $("#NIE-copyRight").html(returnText('ICP备案：浙ICP备15005366号-3'));
+        }
+    }
+    function _setCopy() {
+        var myHref = window.location.href;
+        if (myHref.indexOf("uu.bobo163.net") >= 0 || myHref.indexOf("uu.sowellwell.com") >= 0) {
+            setTimeout(function () {
+                $("#NIE-copyRight").html('');
+                _copyRight();
+            }, 200)
+        }
+    }
+    _setCopy();
+
+});
+
+function ggw() {
+    $('#img-list').css({ 'display': 'none' });
+}

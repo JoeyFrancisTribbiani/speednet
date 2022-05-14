@@ -1,6 +1,4 @@
 #!/bin/bash
-# shadowsocks/ss一键安装脚本
-# Author: hijk<https://hijk.art>
 
 RED="\033[31m"    # Error message
 GREEN="\033[32m"  # Success message
@@ -121,79 +119,80 @@ getData() {
             colorEcho $RED " 输入错误，端口号为1025-65535的数字"
         fi
     done
-    colorEcho $RED " 请选择加密方式:"
-    echo "  1)aes-256-gcm"
-    echo "  2)aes-192-gcm"
-    echo "  3)aes-128-gcm"
-    echo "  4)aes-256-ctr"
-    echo "  5)aes-192-ctr"
-    echo "  6)aes-128-ctr"
-    echo "  7)aes-256-cfb"
-    echo "  8)aes-192-cfb"
-    echo "  9)aes-128-cfb"
-    echo "  10)camellia-128-cfb"
-    echo "  11)camellia-192-cfb"
-    echo "  12)camellia-256-cfb"
-    echo "  13)chacha20-ietf"
-    echo "  14)chacha20-ietf-poly1305"
-    echo "  15)xchacha20-ietf-poly1305"
-    answer=14
-    if [[ -z "$answer" ]]; then
-        METHOD="aes-256-gcm"
-    else
-        case $answer in
-        1)
-            METHOD="aes-256-gcm"
-            ;;
-        2)
-            METHOD="aes-192-gcm"
-            ;;
-        3)
-            METHOD="aes-128-gcm"
-            ;;
-        4)
-            METHOD="aes-256-ctr"
-            ;;
-        5)
-            METHOD="aes-192-ctr"
-            ;;
-        6)
-            METHOD="aes-128-ctr"
-            ;;
-        7)
-            METHOD="aes-256-cfb"
-            ;;
-        8)
-            METHOD="aes-192-cfb"
-            ;;
-        9)
-            METHOD="aes-128-cfb"
-            ;;
-        10)
-            METHOD="camellia-128-cfb"
-            ;;
-        11)
-            METHOD="camellia-192-cfb"
-            ;;
-        12)
-            METHOD="camellia-256-cfb"
-            ;;
-        13)
-            METHOD="chacha20-ietf"
-            ;;
-        14)
-            METHOD="chacha20-ietf-poly1305"
-            ;;
-        15)
-            METHOD="xchacha20-ietf-poly1305"
-            ;;
-        *)
-            colorEcho $RED " 无效的选择，使用默认的aes-256-gcm"
-            METHOD="aes-256-gcm"
-            ;;
-        esac
-    fi
+    # colorEcho $RED " 请选择加密方式:"
+    # echo "  1)aes-256-gcm"
+    # echo "  2)aes-192-gcm"
+    # echo "  3)aes-128-gcm"
+    # echo "  4)aes-256-ctr"
+    # echo "  5)aes-192-ctr"
+    # echo "  6)aes-128-ctr"
+    # echo "  7)aes-256-cfb"
+    # echo "  8)aes-192-cfb"
+    # echo "  9)aes-128-cfb"
+    # echo "  10)camellia-128-cfb"
+    # echo "  11)camellia-192-cfb"
+    # echo "  12)camellia-256-cfb"
+    # echo "  13)chacha20-ietf"
+    # echo "  14)chacha20-ietf-poly1305"
+    # echo "  15)xchacha20-ietf-poly1305"
+    # answer=14
+    # if [[ -z "$answer" ]]; then
+    #     METHOD="aes-256-gcm"
+    # else
+    #     case $answer in
+    #     1)
+    #         METHOD="aes-256-gcm"
+    #         ;;
+    #     2)
+    #         METHOD="aes-192-gcm"
+    #         ;;
+    #     3)
+    #         METHOD="aes-128-gcm"
+    #         ;;
+    #     4)
+    #         METHOD="aes-256-ctr"
+    #         ;;
+    #     5)
+    #         METHOD="aes-192-ctr"
+    #         ;;
+    #     6)
+    #         METHOD="aes-128-ctr"
+    #         ;;
+    #     7)
+    #         METHOD="aes-256-cfb"
+    #         ;;
+    #     8)
+    #         METHOD="aes-192-cfb"
+    #         ;;
+    #     9)
+    #         METHOD="aes-128-cfb"
+    #         ;;
+    #     10)
+    #         METHOD="camellia-128-cfb"
+    #         ;;
+    #     11)
+    #         METHOD="camellia-192-cfb"
+    #         ;;
+    #     12)
+    #         METHOD="camellia-256-cfb"
+    #         ;;
+    #     13)
+    #         METHOD="chacha20-ietf"
+    #         ;;
+    #     14)
+    #         METHOD="chacha20-ietf-poly1305"
+    #         ;;
+    #     15)
+    #         METHOD="xchacha20-ietf-poly1305"
+    #         ;;
+    #     *)
+    #         colorEcho $RED " 无效的选择，使用默认的aes-256-gcm"
+    #         METHOD="aes-256-gcm"
+    #         ;;
+    #     esac
+    # fi
     echo ""
+    METHOD="chacha20-ietf-poly1305"
     colorEcho $BLUE "加密方式： $METHOD"
 }
 
@@ -253,14 +252,14 @@ installNewVer() {
     make && make install
     if [[ $? -ne 0 ]]; then
         echo
-        echo -e " [${RED}错误${PLAIN}]: $OS Shadowsocks-libev 安装失败！ 请打开 https://hijk.art 反馈"
+        echo -e " [${RED}错误${PLAIN}]: $OS libev 安装失败！ 请反馈"
         cd ${BASE} && rm -rf shadowsocks-libev*
         exit 1
     fi
     ssPath=$(which ss-server 2>/dev/null)
     [[ "$ssPath" != "" ]] || {
         cd ${BASE} && rm -rf shadowsocks-libev*
-        colorEcho $RED " SS安装失败，请到 https://hijk.art 反馈"
+        colorEcho $RED "服务端核心安装失败"
         exit 1
     }
     cat >$SERVICE_FILE <<-EOF
@@ -290,7 +289,7 @@ EOF
 
 installSS() {
     echo ""
-    colorEcho $BLUE " 安装最新版SS..."
+    colorEcho $BLUE " 安装最新版服务端核心..."
 
     tag_url="${V6_PROXY}https://api.github.com/repos/shadowsocks/shadowsocks-libev/releases/latest"
     new_ver="$(normalizeVersion "$(curl -s "${tag_url}" --connect-timeout 10 | grep 'tag_name' | cut -d\" -f4)")"
@@ -304,7 +303,7 @@ installSS() {
         if [[ $ver != $new_ver ]]; then
             installNewVer $new_ver
         else
-            colorEcho $YELLOW " 已安装最新版SS"
+            colorEcho $YELLOW " 已安装最新版服务端核心"
         fi
     fi
 }
@@ -414,7 +413,7 @@ setFirewall() {
 showInfo() {
     res=$(status)
     if [[ $res -lt 2 ]]; then
-        echo -e " ${RED}SS未安装，请先安装！${PLAIN}"
+        echo -e " ${RED}服务端核心未安装，请先安装！${PLAIN}"
         return
     fi
 
@@ -428,23 +427,23 @@ showInfo() {
     link="ss://${res}"
 
     echo ============================================
-    echo -e " ${BLUE}ss运行状态${PLAIN}：${status}"
-    echo -e " ${BLUE}ss配置文件：${PLAIN}${RED}$CONFIG_FILE${PLAIN}"
+    echo -e " ${BLUE}服务端核心运行状态${PLAIN}：${status}"
+    # echo -e " ${BLUE}服务端核心配置文件：${PLAIN}${RED}$CONFIG_FILE${PLAIN}"
     echo ""
-    echo -e " ${RED}ss配置信息：${PLAIN}"
+    echo -e " ${RED}服务端核心配置信息：${PLAIN}"
     echo -e "  ${BLUE}IP(address):${PLAIN}  ${RED}${IP}${PLAIN}"
     echo -e "  ${BLUE}端口(port)：${PLAIN}${RED}${port}${PLAIN}"
     echo -e "  ${BLUE}密码(password)：${PLAIN}${RED}${password}${PLAIN}"
     echo -e "  ${BLUE}加密方式(method)：${PLAIN} ${RED}${method}${PLAIN}"
     echo
-    echo -e " ${BLUE}ss链接${PLAIN}： ${link}"
+    # echo -e " ${BLUE}ss链接${PLAIN}： ${link}"
     #qrencode -o - -t utf8 ${link}
 }
 
 showQR() {
     res=$(status)
     if [[ $res -lt 2 ]]; then
-        echo -e " ${RED}SS未安装，请先安装！${PLAIN}"
+        echo -e " ${RED}服务端核心未安装，请先安装！${PLAIN}"
         return
     fi
 
@@ -488,7 +487,7 @@ install() {
 reconfig() {
     res=$(status)
     if [[ $res -lt 2 ]]; then
-        echo -e " ${RED}SS未安装，请先安装！${PLAIN}"
+        echo -e " ${RED}服务端核心未安装，请先安装！${PLAIN}"
         return
     fi
     getData
@@ -502,7 +501,7 @@ reconfig() {
 update() {
     res=$(status)
     if [[ $res -lt 2 ]]; then
-        echo -e " ${RED}SS未安装，请先安装！${PLAIN}"
+        echo -e " ${RED}服务端核心未安装，请先安装！${PLAIN}"
         return
     fi
     installSS
@@ -512,7 +511,7 @@ update() {
 start() {
     res=$(status)
     if [[ $res -lt 2 ]]; then
-        echo -e " ${RED}SS未安装，请先安装！${PLAIN}"
+        echo -e " ${RED}服务端核心未安装，请先安装！${PLAIN}"
         return
     fi
     systemctl restart ${NAME}
@@ -520,16 +519,16 @@ start() {
     port=$(grep server_port $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
     res=$(ss -nltp | grep ${port} | grep ss-server)
     if [[ "$res" = "" ]]; then
-        colorEcho $RED " SS启动失败，请检查端口是否被占用！"
+        colorEcho $RED " 服务端核心启动失败，请检查端口是否被占用！"
     else
-        colorEcho $BLUE " SS启动成功！"
+        colorEcho $BLUE " 服务端核心启动成功！"
     fi
 }
 
 restart() {
     res=$(status)
     if [[ $res -lt 2 ]]; then
-        echo -e " ${RED}SS未安装，请先安装！${PLAIN}"
+        echo -e " ${RED}服务端核心未安装，请先安装！${PLAIN}"
         return
     fi
 
@@ -540,22 +539,22 @@ restart() {
 stop() {
     res=$(status)
     if [[ $res -lt 2 ]]; then
-        echo -e " ${RED}SS未安装，请先安装！${PLAIN}"
+        echo -e " ${RED}服务端核心未安装，请先安装！${PLAIN}"
         return
     fi
     systemctl stop ${NAME}
-    colorEcho $BLUE " SS停止成功"
+    colorEcho $BLUE " 服务端核心停止成功"
 }
 
 uninstall() {
     res=$(status)
     if [[ $res -lt 2 ]]; then
-        echo -e " ${RED}SS未安装，请先安装！${PLAIN}"
+        echo -e " ${RED}服务端核心未安装，请先安装！${PLAIN}"
         return
     fi
 
     echo ""
-    read -p " 确定卸载SS吗？(y/n)" answer
+    read -p " 确定卸载服务端核心吗？(y/n)" answer
     [[ -z ${answer} ]] && answer="n"
 
     if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]]; then
@@ -566,14 +565,14 @@ uninstall() {
         rm -rf /usr/share/doc/shadowsocks-libev*
         rm -rf /usr/share/man/man1/ss-*.gz
         rm -rf /usr/share/man/man8/shadowsocks-libev*
-        colorEcho $GREEN " SS卸载成功"
+        colorEcho $GREEN " 服务端核心卸载成功"
     fi
 }
 
 showLog() {
     res=$(status)
     if [[ $res -lt 2 ]]; then
-        echo -e " ${RED}SS未安装，请先安装！${PLAIN}"
+        echo -e " ${RED}服务端核心未安装，请先安装！${PLAIN}"
         return
     fi
     journalctl -xen --no-pager -u ${NAME}

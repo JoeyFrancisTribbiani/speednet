@@ -1,0 +1,1 @@
+nie.define(function(){$("#img-list").click(function(i){nie.config.stats.url.addto("click=piaochuang","\u98d8\u7a97\u70b9\u51fb"),i.stopPropagation()})});
