@@ -116,14 +116,14 @@ Download_transfer() {
 }
 Service_transfer() {
     if [[ ${release} = "centos" ]]; then
-        if ! wget --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubiBackup/doubi/master/service/brook-pf_centos -O /etc/init.d/transfer-pf; then
+        if ! wget --no-check-certificate https://raw.githubusercontent.com/JoeyFrancisTribbiani/speednet/master/brook-pf.sh -O /etc/init.d/transfer-pf; then
             echo -e "${Error} transfer服务 管理脚本下载失败 !" && exit 1
         fi
         chmod +x /etc/init.d/transfer-pf
         chkconfig --add transfer-pf
         chkconfig transfer-pf on
     else
-        if ! wget --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubiBackup/doubi/master/service/brook-pf_debian -O /etc/init.d/transfer-pf; then
+        if ! wget --no-check-certificate https://raw.githubusercontent.com/JoeyFrancisTribbiani/speednet/master/brook-pf.sh -O /etc/init.d/transfer-pf; then
             echo -e "${Error} transfer服务 管理脚本下载失败 !" && exit 1
         fi
         chmod +x /etc/init.d/transfer-pf
@@ -450,7 +450,7 @@ Install_transfer() {
     echo "" >${transfer_conf}
     echo -e "${Info} 开始设置 iptables防火墙..."
     Set_iptables
-    echo -e "${Info} transfer 安装完成！默认配置文件为空，请选择 [4.设置 transfer 内容分发 - 1.添加 内容分发] 来添加内容分发。"
+    echo -e "${Info} transfer 安装完成！默认配置文件为空，请选择 [7.设置 transfer 内容分发 - 1.添加 内容分发] 来添加内容分发。"
 }
 Start_transfer() {
     check_installed_status
@@ -472,7 +472,7 @@ Restart_transfer() {
 }
 Update_transfer() {
     # check_installed_status
-    echo "无更新\n"
+    echo "无更新"
 }
 Uninstall_transfer() {
     check_installed_status
@@ -609,14 +609,14 @@ Set_iptables() {
     fi
 }
 Update_Shell() {
-    sh_new_ver=$(wget --no-check-certificate -qO- -t1 -T3 "https://raw.githubusercontent.com/ToyoDAdoubiBackup/doubi/master/transfer-pf.sh" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1) && sh_new_type="github"
-    [[ -z ${sh_new_ver} ]] && echo -e "${Error} 无法链接到 Github !" && exit 0
-    if [[ -e "/etc/init.d/transfer-pf" ]]; then
-        rm -rf /etc/init.d/transfer-pf
-        Service_transfer
-    fi
-    wget -N --no-check-certificate "https://raw.githubusercontent.com/ToyoDAdoubiBackup/doubi/master/transfer-pf.sh" && chmod +x transfer.sh
-    echo -e "脚本已更新为最新版本[ ${sh_new_ver} ] !(注意：因为更新方式为直接覆盖当前运行的脚本，所以可能下面会提示一些报错，无视即可)" && exit 0
+    # sh_new_ver=$(wget --no-check-certificate -qO- -t1 -T3 "https://raw.githubusercontent.com/ToyoDAdoubiBackup/doubi/master/transfer-pf.sh" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1) && sh_new_type="github"
+    # [[ -z ${sh_new_ver} ]] && echo -e "${Error} 无法链接到 Github !" && exit 0
+    # if [[ -e "/etc/init.d/transfer-pf" ]]; then
+    #     rm -rf /etc/init.d/transfer-pf
+    #     Service_transfer
+    # fi
+    # wget -N --no-check-certificate "https://raw.githubusercontent.com/ToyoDAdoubiBackup/doubi/master/transfer-pf.sh" && chmod +x transfer.sh
+    echo -e "脚本已更新为最新版本!(注意：因为更新方式为直接覆盖当前运行的脚本，所以可能下面会提示一些报错，无视即可)" && exit 0
 }
 check_sys
 action=$1
@@ -624,22 +624,22 @@ if [[ "${action}" == "monitor" ]]; then
     crontab_monitor_transfer
 else
 
-    # ————————————
-    #  ${Green_font_prefix} 4.${Font_color_suffix} 启动 transfer
-    #  ${Green_font_prefix} 5.${Font_color_suffix} 停止 transfer
-    #  ${Green_font_prefix} 6.${Font_color_suffix} 重启 transfer
     echo && echo -e "  transfer 内容分发 一键管理脚本 
-  
+ 
  ${Green_font_prefix} 0.${Font_color_suffix} 升级脚本
 ————————————
  ${Green_font_prefix} 1.${Font_color_suffix} 安装 transfer
  ${Green_font_prefix} 2.${Font_color_suffix} 更新 transfer
  ${Green_font_prefix} 3.${Font_color_suffix} 卸载 transfer
 ————————————
- ${Green_font_prefix} 4.${Font_color_suffix} 设置 transfer 内容分发
- ${Green_font_prefix} 5.${Font_color_suffix} 查看 transfer 内容分发
- ${Green_font_prefix} 6.${Font_color_suffix} 查看 transfer 日志
- ${Green_font_prefix} 7.${Font_color_suffix} 监控 transfer 运行状态
+ ${Green_font_prefix} 4.${Font_color_suffix} 启动 transfer
+ ${Green_font_prefix} 5.${Font_color_suffix} 停止 transfer
+ ${Green_font_prefix} 6.${Font_color_suffix} 重启 transfer
+————————————
+ ${Green_font_prefix} 7.${Font_color_suffix} 设置 transfer 内容分发
+ ${Green_font_prefix} 8.${Font_color_suffix} 查看 transfer 内容分发
+ ${Green_font_prefix} 9.${Font_color_suffix} 查看 transfer 日志
+ ${Green_font_prefix}10.${Font_color_suffix} 监控 transfer 运行状态
 ————————————" && echo
     if [[ -e ${transfer_file} ]]; then
         check_pid
@@ -666,26 +666,26 @@ else
     3)
         Uninstall_transfer
         ;;
-    # 4)
-    #     Start_transfer
-    #     ;;
-    # 5)
-    #     Stop_transfer
-    #     ;;
-    # 6)
-    #     Restart_transfer
-    #     ;;
     4)
-        Set_transfer
+        Start_transfer
         ;;
     5)
+        Stop_transfer
+        ;;
+    6)
+        Restart_transfer
+        ;;
+    7)
+        Set_transfer
+        ;;
+    8)
         check_installed_status
         list_port
         ;;
-    6)
+    9)
         View_Log
         ;;
-    7)
+    10)
         Set_crontab_monitor_transfer
         ;;
     *)

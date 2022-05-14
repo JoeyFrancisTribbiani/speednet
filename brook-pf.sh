@@ -1,22 +1,22 @@
 #!/bin/bash
 # chkconfig: 2345 90 10
-# description: Brook-pf
+# description: transfer-pf
 
 ### BEGIN INIT INFO
-# Provides:          Brook-pf
+# Provides:          transfer-pf
 # Required-Start:    $network $syslog
 # Required-Stop:     $network
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Lightweight port forwarding tool
-# Description:       Start or stop the Brook-pf
+# Description:       Start or stop the transfer-pf
 ### END INIT INFO
 
-NAME="Brook-pf"
-NAME_BIN="brook relays"
-FILE="/usr/local/brook-pf"
-CONF="${FILE}/brook.conf"
-LOG="${FILE}/brook.log"
+NAME="transfer-pf"
+NAME_BIN="transfer relays"
+FILE="/usr/local/transfer-pf"
+CONF="${FILE}/transfer.conf"
+LOG="${FILE}/transfer.log"
 
 Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
 Info="${Green_font_prefix}[信息]${Font_color_suffix}"
@@ -32,10 +32,10 @@ check_running() {
     fi
 }
 read_config() {
-    [[ ! -e ${CONF} ]] && echo -e "${Error} Brook 配置文件不存在 !" && exit 1
+    [[ ! -e ${CONF} ]] && echo -e "${Error} transfer 配置文件不存在 !" && exit 1
     user_all=$(cat ${CONF} | sed '/^\s*$/d')
     user_all_num=$(echo "${user_all}" | wc -l)
-    [[ -z ${user_all} ]] && echo -e "${Error} Brook 配置文件中用户配置为空 !" && exit 1
+    [[ -z ${user_all} ]] && echo -e "${Error} transfer 配置文件中用户配置为空 !" && exit 1
 }
 View_User() {
     for ((integer = 1; integer <= ${user_all_num}; integer++)); do
@@ -86,8 +86,8 @@ do_start() {
             servers_all="${servers_all} --from :${user_port} --to ${user_ip_pf}:${user_port_pf} "
             # servers_all="${servers_all}-l \":${user_port} ${user_ip_pf}:${user_port_pf}\" "
         done
-        # eval nohup ./brook relays $(echo ${servers_all}) >> "${LOG}" 2>&1 &
-        eval nohup ./brook relay $(echo ${servers_all}) >>"${LOG}" 2>&1 &
+        # eval nohup ./transfer relays $(echo ${servers_all}) >> "${LOG}" 2>&1 &
+        eval nohup ./transfer relay $(echo ${servers_all}) >>"${LOG}" 2>&1 &
         sleep 2s
         check_running
         if [[ $? -eq 0 ]]; then
