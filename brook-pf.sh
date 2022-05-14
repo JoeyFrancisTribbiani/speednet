@@ -13,7 +13,7 @@
 ### END INIT INFO
 
 NAME="transfer-pf"
-NAME_BIN="transfer relays"
+NAME_BIN="transfer relay"
 FILE="/usr/local/transfer-pf"
 CONF="${FILE}/transfer.conf"
 LOG="${FILE}/transfer.log"
