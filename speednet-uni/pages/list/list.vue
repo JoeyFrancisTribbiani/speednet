@@ -12,7 +12,8 @@
 		</view>
 
 		<unicloud-db ref='udb' v-slot:default="{data,pagination,hasMore, loading, error, options}" @error="onqueryerror"
-			:collection="'speednet-game'" :orderby="'create_date desc'" :page-size="10">
+			:collection="'speednet-game'" :where="'platform==2 && status==1'" :orderby="'create_date desc'"
+			:page-size="10">
 			<!-- 基于 uni-list 的页面布局 field="user_id.username"-->
 			<uni-list class="uni-list" :border="false" :style="{height:listHight}">
 

@@ -1,0 +1,82 @@
+{
+	"bsonType": "object",
+	"required": ["peer_name", "region_id", "server", "port"],
+	"permission": {
+		"read": true,
+		"create": true,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"region_id": {
+			"bsonType": "string",
+			"description": "所属区服ID",
+			"foreignKey": "speednet-game-region._id",
+			"enum": {
+				"collection": "speednet-game-region", // 表名，这里使用 uni-id-roles表举例，在uniCloud控制台使用 opendb 创建此表
+				"field": "_id as value,region_name as text" //字段筛选，需要 as 成前端组件支持的字段名 text、value。text、value是datacom组件规范的标准
+				// "where": "_id==region_id" // 查询条件
+				// "orderby": "" // 排序字段及正序倒叙设置
+			},
+			"title": "所属区服"
+		},
+		"peer_name": {
+			"bsonType": "string",
+			"description": "节点名称",
+			"title": "节点名称"
+		},
+		"server": {
+			"bsonType": "string",
+			"title": "节点IP",
+			"description": "节点ip"
+		},
+		"port": {
+			"bsonType": "int",
+			"title": "节点端口",
+			"description": "节点端口"
+		},
+		"cipher": {
+			"bsonType": "string",
+			"title": "加密方式",
+			"description": "加密方式"
+		},
+		"passwrod": {
+			"bsonType": "string",
+			"title": "密码",
+			"description": "密码",
+			"trim": "both"
+		},
+		"comment1": {
+			"bsonType": "string",
+			"title": "备注",
+			"description": "备注"
+		},
+		"comment2": {
+			"bsonType": "string",
+			"title": "备注2",
+			"description": "备注2"
+		},
+		"status": {
+			"bsonType": "int",
+			"title": "节点状态",
+			"enum": [{
+				"value": 1,
+				"text": "正常"
+			}, {
+				"value": 2,
+				"text": "异常"
+			}],
+			"description": "节点状态 1:正常 2:异常"
+		},
+		"create_date": {
+			"bsonType": "timestamp",
+			"description": "创建时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		}
+	}
+}

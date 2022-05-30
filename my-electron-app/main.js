@@ -2,7 +2,7 @@
  * @Author: Joey
  * @Date: 2022-04-24 16:21:30
  * @LastEditors: Joey
- * @LastEditTime: 2022-04-26 15:08:01
+ * @LastEditTime: 2022-05-26 16:00:19
  * @FilePath: \my-electron-app\main.js
  */
 const { app, BrowserWindow, ipcMain } = require('electron')
@@ -61,6 +61,8 @@ app.whenReady().then(() => {
     ipcMain.on('start-vpn', handleStartVpn)
     ipcMain.on('stop-vpn', handleStopVpn)
     createWindow()
+    const { Menu } = require('electron');
+    Menu.setApplicationMenu(null);
 })
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()

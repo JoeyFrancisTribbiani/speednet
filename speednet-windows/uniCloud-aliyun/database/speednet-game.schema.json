@@ -1,0 +1,80 @@
+{
+	"bsonType": "object",
+	"required": ["game_name", "processes", "port"],
+	"permission": {
+		"read": true,
+		"create": true,
+		"update": true,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"game_name": {
+			"bsonType": "string",
+			"title": "游戏名称",
+			"description": "游戏名称"
+		},
+		"processes": {
+			"bsonType": "string",
+			"title": "进程名（多个逗号隔开）",
+			"description": "进程名（可以是多个，逗号隔开）"
+		},
+		"ips": {
+			"bsonType": "string",
+			"title": "服务器IP（多个逗号隔开）",
+			"description": "服务器IP（可以是多个，逗号隔开）"
+		},
+		"picture": {
+			"bsonType": "file",
+			"fileMediaType": "image", // 可选值 all|image|video 默认值为all,表示所有文件，image表示图片类型文件，video表示视频类型文件
+			"fileExtName": "jpg,png", // 扩展名过滤，多个用 , 分割
+			"title": "游戏封面",
+			"description": "游戏封面"
+		},
+		"regions": {
+			"bsonType": "array",
+			"title": "区服列表",
+			"foreignKey": "speednet-game-region._id",
+			"enum": {
+				"collection": "speednet-game-region", // 表名，这里使用 uni-id-roles表举例，在uniCloud控制台使用 opendb 创建此表
+				"field": "region_name as text, _id as value" //字段筛选，需要 as 成前端组件支持的字段名 text、value。text、value是datacom组件规范的标准
+				// "where": "", // 查询条件
+				// "orderby": "" // 排序字段及正序倒叙设置
+			},
+			"description": "游戏的区服列表"
+		},
+		"platform": {
+			"bsonType": "int",
+			"title": "游戏平台",
+			"enum": [{
+				"value": 1,
+				"text": "PC"
+			}, {
+				"value": 2,
+				"text": "Android"
+			}],
+			"description": "游戏平台 1:PC端 2:Android端"
+		},
+		"create_date": {
+			"bsonType": "timestamp",
+			"description": "创建时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		},
+		"status": {
+			"bsonType": "int",
+			"title": "上架状态",
+			"enum": [{
+				"value": 1,
+				"text": "上架"
+			}, {
+				"value": 2,
+				"text": "下架"
+			}],
+			"description": "上架状态 1:上架 2:下架"
+		}
+	}
+}
