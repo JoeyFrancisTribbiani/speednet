@@ -35,199 +35,189 @@
 </template>
 
 <script>
-	import pushServer from './dc-push/push.js';
-	import {
-		mapMutations,
-		mapGetters,
-		mapActions
-	} from 'vuex';
-	export default {
-		data() {
-			return {
-				pushServer: pushServer,
-				supportMode: [],
-				pushIsOn: "wait",
-				currentLanguage: "",
-				isOpenAtLogin: false,
-				isAutoSpeed: false
-			}
-		},
-		computed: {
-			...mapGetters({
-				'userInfo': 'user/info',
-				'hasLogin': 'user/hasLogin',
-			}),
-			i18nEnable() {
-				return getApp().globalData.config.i18n.enable
-			}
-		},
-		onLoad() {
-			this.currentLanguage = uni.getStorageSync('CURRENT_LANG') == "en" ? 'English' : '简体中文'
+import pushServer from "./dc-push/push.js";
+import { mapMutations, mapGetters, mapActions } from "vuex";
+export default {
+  data() {
+    return {
+      pushServer: pushServer,
+      supportMode: [],
+      pushIsOn: "wait",
+      currentLanguage: "",
+      isOpenAtLogin: false,
+      isAutoSpeed: false,
+    };
+  },
+  computed: {
+    ...mapGetters({
+      userInfo: "user/info",
+      hasLogin: "user/hasLogin",
+    }),
+    i18nEnable() {
+      return getApp().globalData.config.i18n.enable;
+    },
+  },
+  onLoad() {
+    this.currentLanguage =
+      uni.getStorageSync("CURRENT_LANG") == "en" ? "English" : "简体中文";
 
+    this.isOpenAtLogin = uni.getStorageSync("openAtLogin");
+    this.isAutoSpeed = uni.getStorageSync("autoSpeed");
 
-			this.isOpenAtLogin = uni.getStorageSync("openAtLogin")
-			this.isAutoSpeed = uni.getStorageSync("autoSpeed")
-
-
-
-			uni.setNavigationBarTitle({
-				title: this.$t('settings.navigationBarTitle')
-			})
-
-		},
-		onShow() {
-			// 检查手机端获取推送是否开启
-			//#ifdef APP-PLUS
-			setTimeout(() => {
-				this.pushIsOn = pushServer.isOn();
-			}, 300)
-			//#endif
-		},
-		methods: {
-			...mapActions({
-				logout: 'user/logout'
-			}),
-			changeOpenAtLogin(e) {
-				console.log("openAtLogin------------" + e.value)
-				uni.setStorageSync("openAtLogin", e.value)
-				window.electronAPI.openAtLogin(e.value)
-			},
-			changeAutoSpeed(e) {
-				console.log("autoSpeed----changed!!!!!!!!!" + e.value)
-				uni.setStorageSync("autoSpeed", e.value)
-			},
-			toEdit() {
-				uni.navigateTo({
-					url: '/pages/ucenter/userinfo/userinfo'
-				});
-			},
-			deactivate() {
-				uni.navigateTo({
-					url: "/pages/ucenter/settings/deactivate/deactivate"
-				})
-			},
-			changePwd() {
-				uni.navigateTo({
-					url: '/pages/ucenter/login-page/pwd-retrieve/pwd-retrieve?phoneNumber=' +
-						(this.userInfo && this.userInfo.mobile ? this.userInfo.mobile : ''),
-					fail: err => {
-						console.log(err);
-					}
-				});
-			},
-			/**
-			 * 开始生物认证
-			 */
-			startSoterAuthentication(checkAuthMode) {
-				console.log(checkAuthMode);
-				let title = {
-					"fingerPrint": this.$t('settings.fingerPrint'),
-					"facial": this.$t('settings.facial')
-				} [checkAuthMode]
-				// 检查是否开启认证
-				this.checkIsSoterEnrolledInDevice({
-						checkAuthMode,
-						title
-					})
-					.then(() => {
-						console.log(checkAuthMode, title);
-						// 开始认证
-						uni.startSoterAuthentication({
-							requestAuthModes: [checkAuthMode],
-							challenge: '123456', // 微信端挑战因子
-							authContent: this.$t('settings.please') + " " + `${title}`,
-							complete: (res) => {
-								console.log(res);
-							},
-							success: (res) => {
-								console.log(res);
-								if (res.errCode == 0) {
-									/**
-									 * 验证成功后开启自己的业务逻辑
-									 * 
-									 * app端以此为依据 验证成功
-									 * 
-									 * 微信小程序需要再次通过后台验证resultJSON与resultJSONSignature获取最终结果
-									 */
-									return uni.showToast({
-										title: `${title}` + this.$t('settings.successText'),
-										icon: 'none'
-									});
-								}
-								uni.showToast({
-									title: this.$t('settings.failTip'),
-									icon: 'none'
-								});
-							},
-							fail: (err) => {
-								console.log(err);
-								console.log(`认证失败:${err.errCode}`);
-								uni.showToast({
-									title: this.$t('settings.authFailed'),
-									// title: `认证失败`,
-									icon: 'none'
-								});
-							}
-						})
-					})
-			},
-			checkIsSoterEnrolledInDevice({
-				checkAuthMode,
-				title
-			}) {
-				return new Promise((resolve, reject) => {
-					uni.checkIsSoterEnrolledInDevice({
-						checkAuthMode,
-						success: (res) => {
-							console.log(res);
-							if (res.isEnrolled) {
-								return resolve(res);
-							}
-							uni.showToast({
-								title: this.$t('settings.deviceNoOpen') + `${title}`,
-								icon: 'none'
-							});
-							reject(res);
-						},
-						fail: (err) => {
-							console.log(err);
-							uni.showToast({
-								title: `${title}` + this.$t('settings.fail'),
-								icon: 'none'
-							});
-							reject(err);
-						}
-					})
-				})
-			},
-			clickLogout() {
-				if (this.hasLogin) {
-					uni.showModal({
-						title: this.$t('settings.tips'),
-						content: this.$t('settings.exitLogin'),
-						cancelText: this.$t('settings.cancelText'),
-						confirmText: this.$t('settings.confirmText'),
-						success: res => {
-							if (res.confirm) {
-								this.logout()
-								uni.navigateBack();
-							}
-						},
-						fail: () => {},
-						complete: () => {}
-					});
-				} else {
-					uni.navigateTo({
-						url: '/pages/ucenter/login-page/index/index'
-					});
-				}
-			},
-			clearTmp() {
-				uni.showLoading({
-					title: this.$t('settings.clearing'),
-					mask: true
-				});
-				/*
+    uni.setNavigationBarTitle({
+      title: this.$t("settings.navigationBarTitle"),
+    });
+  },
+  onShow() {
+    // 检查手机端获取推送是否开启
+    //#ifdef APP-PLUS
+    setTimeout(() => {
+      this.pushIsOn = pushServer.isOn();
+    }, 300);
+    //#endif
+  },
+  methods: {
+    ...mapActions({
+      logout: "user/logout",
+    }),
+    changeOpenAtLogin(e) {
+      console.log("openAtLogin------------" + e.value);
+      uni.setStorageSync("openAtLogin", e.value);
+      window.electronAPI.openAtLogin(e.value);
+    },
+    changeAutoSpeed(e) {
+      console.log("autoSpeed----changed!!!!!!!!!" + e.value);
+      uni.setStorageSync("autoSpeed", e.value);
+    },
+    toEdit() {
+      uni.navigateTo({
+        url: "/pages/ucenter/userinfo/userinfo",
+      });
+    },
+    deactivate() {
+      uni.navigateTo({
+        url: "/pages/ucenter/settings/deactivate/deactivate",
+      });
+    },
+    changePwd() {
+      uni.navigateTo({
+        url:
+          "/pages/ucenter/login-page/pwd-retrieve/pwd-retrieve?phoneNumber=" +
+          (this.userInfo && this.userInfo.mobile ? this.userInfo.mobile : ""),
+        fail: (err) => {
+          console.log(err);
+        },
+      });
+    },
+    /**
+     * 开始生物认证
+     */
+    startSoterAuthentication(checkAuthMode) {
+      console.log(checkAuthMode);
+      let title = {
+        fingerPrint: this.$t("settings.fingerPrint"),
+        facial: this.$t("settings.facial"),
+      }[checkAuthMode];
+      // 检查是否开启认证
+      this.checkIsSoterEnrolledInDevice({
+        checkAuthMode,
+        title,
+      }).then(() => {
+        console.log(checkAuthMode, title);
+        // 开始认证
+        uni.startSoterAuthentication({
+          requestAuthModes: [checkAuthMode],
+          challenge: "123456", // 微信端挑战因子
+          authContent: this.$t("settings.please") + " " + `${title}`,
+          complete: (res) => {
+            console.log(res);
+          },
+          success: (res) => {
+            console.log(res);
+            if (res.errCode == 0) {
+              /**
+               * 验证成功后开启自己的业务逻辑
+               *
+               * app端以此为依据 验证成功
+               *
+               * 微信小程序需要再次通过后台验证resultJSON与resultJSONSignature获取最终结果
+               */
+              return uni.showToast({
+                title: `${title}` + this.$t("settings.successText"),
+                icon: "none",
+              });
+            }
+            uni.showToast({
+              title: this.$t("settings.failTip"),
+              icon: "none",
+            });
+          },
+          fail: (err) => {
+            console.log(err);
+            console.log(`认证失败:${err.errCode}`);
+            uni.showToast({
+              title: this.$t("settings.authFailed"),
+              // title: `认证失败`,
+              icon: "none",
+            });
+          },
+        });
+      });
+    },
+    checkIsSoterEnrolledInDevice({ checkAuthMode, title }) {
+      return new Promise((resolve, reject) => {
+        uni.checkIsSoterEnrolledInDevice({
+          checkAuthMode,
+          success: (res) => {
+            console.log(res);
+            if (res.isEnrolled) {
+              return resolve(res);
+            }
+            uni.showToast({
+              title: this.$t("settings.deviceNoOpen") + `${title}`,
+              icon: "none",
+            });
+            reject(res);
+          },
+          fail: (err) => {
+            console.log(err);
+            uni.showToast({
+              title: `${title}` + this.$t("settings.fail"),
+              icon: "none",
+            });
+            reject(err);
+          },
+        });
+      });
+    },
+    clickLogout() {
+      if (this.hasLogin) {
+        uni.showModal({
+          title: this.$t("settings.tips"),
+          content: this.$t("settings.exitLogin"),
+          cancelText: this.$t("settings.cancelText"),
+          confirmText: this.$t("settings.confirmText"),
+          success: (res) => {
+            if (res.confirm) {
+              this.logout();
+              uni.navigateBack();
+            }
+          },
+          fail: () => {},
+          complete: () => {},
+        });
+      } else {
+        uni.navigateTo({
+          url: "/pages/ucenter/login-page/index/index",
+        });
+      }
+    },
+    clearTmp() {
+      uni.showLoading({
+        title: this.$t("settings.clearing"),
+        mask: true,
+      });
+      /*
 				任何临时存储或删除不直接影响程序运行逻辑（清除缓存必定造成业务逻辑的变化，如：打开页面的图片不从缓存中读取而从网络请求）的内容都可以视为缓存。主要有storage、和file写入。
 				缓存分为三部分		
 					原生层（如：webview、x5播放器的、第三方sdk的、地图组件等）
@@ -238,173 +228,173 @@
 						比如：有聊天功能的应用，聊天记录是否视为缓存，还是单独提供清除聊天记录的功能由开发者自己设计
 					）
 				*/
-				uni.getSavedFileList({
-					success: res => {
-						if (res.fileList.length > 0) {
-							uni.removeSavedFile({
-								filePath: res.fileList[0].filePath,
-								complete: res => {
-									console.log(res);
-									uni.hideLoading()
-									uni.showToast({
-										title: this.$t('settings.clearedSuccessed'),
-										icon: 'none'
-									});
-								}
-							});
-						} else {
-							uni.hideLoading()
-							uni.showToast({
-								title: this.$t('settings.clearedSuccessed'),
-								icon: 'none'
-							});
-						}
-					},
-					complete: e => {
-						console.log(e);
-					}
-				});
-			},
-			changeLanguage() {
-				console.log('语言切换')
-				uni.showActionSheet({
-					itemList: ["English", "简体中文"],
-					success: res => {
-						console.log(res.tapIndex);
-						let language = uni.getStorageSync('CURRENT_LANG')
-						if (
-							!res.tapIndex && language == 'zh-Hans' || res.tapIndex && language == 'en'
-						) {
-							const globalData = getApp().globalData
-							if (language === 'en') {
-								language = globalData.locale = 'zh-Hans'
-							} else {
-								language = globalData.locale = 'en'
-							}
-							uni.setStorageSync('CURRENT_LANG', language)
-							getApp().globalData.$i18n.locale = language
-							this.currentLanguage = res.tapIndex ? '简体中文' : 'English'
-							if (uni.setLocale) {
-								uni.setLocale(language)
-							}
-							uni.reLaunch({
-								url: '/pages/list/list',
-								complete: () => {
-									uni.$emit("changeLanguage", language)
-								}
-							})
-						}
-					},
-					fail: () => {},
-					complete: () => {}
-				});
-			}
-		}
-	}
+      uni.getSavedFileList({
+        success: (res) => {
+          if (res.fileList.length > 0) {
+            uni.removeSavedFile({
+              filePath: res.fileList[0].filePath,
+              complete: (res) => {
+                console.log(res);
+                uni.hideLoading();
+                uni.showToast({
+                  title: this.$t("settings.clearedSuccessed"),
+                  icon: "none",
+                });
+              },
+            });
+          } else {
+            uni.hideLoading();
+            uni.showToast({
+              title: this.$t("settings.clearedSuccessed"),
+              icon: "none",
+            });
+          }
+        },
+        complete: (e) => {
+          console.log(e);
+        },
+      });
+    },
+    changeLanguage() {
+      console.log("语言切换");
+      uni.showActionSheet({
+        itemList: ["English", "简体中文"],
+        success: (res) => {
+          console.log(res.tapIndex);
+          let language = uni.getStorageSync("CURRENT_LANG");
+          if (
+            (!res.tapIndex && language == "zh-Hans") ||
+            (res.tapIndex && language == "en")
+          ) {
+            const globalData = getApp().globalData;
+            if (language === "en") {
+              language = globalData.locale = "zh-Hans";
+            } else {
+              language = globalData.locale = "en";
+            }
+            uni.setStorageSync("CURRENT_LANG", language);
+            getApp().globalData.$i18n.locale = language;
+            this.currentLanguage = res.tapIndex ? "简体中文" : "English";
+            if (uni.setLocale) {
+              uni.setLocale(language);
+            }
+            uni.reLaunch({
+              url: "/pages/list/list",
+              complete: () => {
+                uni.$emit("changeLanguage", language);
+              },
+            });
+          }
+        },
+        fail: () => {},
+        complete: () => {},
+      });
+    },
+  },
+};
 </script>
 
 <style>
-	/* #ifndef APP-NVUE */
-	page {
-		flex: 1;
-		width: 100%;
-		height: 100%;
-	}
+/* #ifndef APP-NVUE */
+page {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
 
-	uni-button:after {
-		border: none;
-		border-radius: 0;
-	}
+uni-button:after {
+  border: none;
+  border-radius: 0;
+}
 
-	/* #endif */
-	.content {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		width: 750rpx;
-		height: 100vh;
-		/* #endif */
-		flex-direction: column;
-		flex: 1;
-		background-color: #F9F9F9;
-	}
+/* #endif */
+.content {
+  /* #ifndef APP-NVUE */
+  display: flex;
+  width: 750rpx;
+  height: 100vh;
+  /* #endif */
+  flex-direction: column;
+  flex: 1;
+  background-color: #f9f9f9;
+}
 
-	.bottom-back {
-		margin-top: 10px;
-		width: 750rpx;
-		height: 44px;
-		/* #ifndef APP-NVUE */
-		display: flex;
-		/* #endif */
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		/* #ifndef APP-NVUE */
-		border: none;
-		/* #endif */
-		border-width: 0;
-		border-radius: 0;
-		background-color: #FFFFFF;
-	}
+.bottom-back {
+  margin-top: 10px;
+  width: 750rpx;
+  height: 44px;
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* #ifndef APP-NVUE */
+  border: none;
+  /* #endif */
+  border-width: 0;
+  border-radius: 0;
+  background-color: #ffffff;
+}
 
-	.bottom-back-text {
-		font-size: 33rpx;
-	}
+.bottom-back-text {
+  font-size: 33rpx;
+}
 
-	.mt10 {
-		margin-top: 10px;
-	}
+.mt10 {
+  margin-top: 10px;
+}
 
-	.uni-list-cell {
-		position: relative;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-	}
+.uni-list-cell {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
 
-	.uni-list-cell-hover {
-		background-color: #eee;
-	}
+.uni-list-cell-hover {
+  background-color: #eee;
+}
 
-	.uni-list-cell-pd {
-		padding: 22rpx 30rpx;
-	}
+.uni-list-cell-pd {
+  padding: 22rpx 30rpx;
+}
 
-	.uni-list-cell-left {
-		white-space: nowrap;
-		/* font-size: 28rpx; */
-		padding: 0 30rpx;
-	}
+.uni-list-cell-left {
+  white-space: nowrap;
+  /* font-size: 28rpx; */
+  padding: 0 30rpx;
+}
 
-	.uni-list-cell-db,
-	.uni-list-cell-right {
-		flex: 1;
-	}
+.uni-list-cell-db,
+.uni-list-cell-right {
+  flex: 1;
+}
 
-	.uni-list-cell::after {
-		position: absolute;
-		z-index: 3;
-		right: 0;
-		bottom: 0;
-		left: 30rpx;
-		height: 1px;
-		content: '';
-		-webkit-transform: scaleY(.5);
-		transform: scaleY(.5);
-		background-color: #c8c7cc;
-	}
+.uni-list-cell::after {
+  position: absolute;
+  z-index: 3;
+  right: 0;
+  bottom: 0;
+  left: 30rpx;
+  height: 1px;
+  content: "";
+  -webkit-transform: scaleY(0.5);
+  transform: scaleY(0.5);
+  background-color: #c8c7cc;
+}
 
-	/* #ifndef APP-NVUE  || VUE3 */
-	.content /deep/ .uni-list {
-		background-color: #F9F9F9;
-	}
+/* #ifndef APP-NVUE  || VUE3 */
+.content /deep/ .uni-list {
+  background-color: #f9f9f9;
+}
 
-	.content /deep/ .uni-list-item--disabled,
-	.list-item {
-		height: 50px;
-		margin-bottom: 1px;
-	}
+.content /deep/ .uni-list-item--disabled,
+.list-item {
+  height: 50px;
+  margin-bottom: 1px;
+}
 
-
-	/* #endif */
+/* #endif */
 </style>

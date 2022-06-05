@@ -22,7 +22,7 @@ const app = new Vue({
 	i18n,
 	store,
 	...App,
-	mounted: function() {
+	mounted: function () {
 
 	}
 })

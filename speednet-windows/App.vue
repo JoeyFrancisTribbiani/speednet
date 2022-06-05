@@ -79,7 +79,6 @@
 		onShow: function() {
 			// 初始化加速状态为否，待进入页面后再获取真正状态
 			uni.setStorageSync('globalSpeedStatus', false)
-
 			console.log('App Show')
 		},
 		onHide: function() {

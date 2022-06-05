@@ -1,5 +1,6 @@
 {
-	"pages": [{
+	"pages": [
+		{
 			"path": "pages/list/list",
 			"style": {
 				// #ifndef APP-PLUS
@@ -15,7 +16,8 @@
 				"navigationStyle": "custom"
 				//#endif
 			}
-		}, {
+		},
+		{
 			"path": "pages/ucenter/login-page/index/index",
 			"style": {
 				"navigationBarTitleText": "",
@@ -24,19 +26,23 @@
 					"popGesture": "none"
 				}
 			}
-		}, {
+		},
+		{
 			"path": "pages/list/search/search",
 			"style": {
 				"navigationBarTitleText": "搜索"
 			}
-		}, {
+		},
+		{
 			"path": "pages/list/detail",
 			"style": {
 				"app-plus": {
 					"titleNView": {
-						"buttons": [{
-							"type": "share"
-						}],
+						"buttons": [
+							{
+								"type": "share"
+							}
+						],
 						"type": "transparent"
 					}
 				},
@@ -47,7 +53,8 @@
 				},
 				"navigationBarTitleText": "文章详情"
 			}
-		}, {
+		},
+		{
 			"path": "pages/ucenter/userinfo/bind-mobile/bind-mobile",
 			"style": {
 				"navigationBarTitleText": "绑定手机号码"
@@ -58,22 +65,24 @@
 			"style": {
 				"navigationStyle": "custom"
 			}
-		}, {
+		},
+		{
 			"path": "pages/ucenter/about/about",
 			"style": {
 				"navigationBarTitleText": "关于"
-					// #ifdef APP-PLUS
-					,
+				// #ifdef APP-PLUS
+				,
 				"app-plus": {
 					"titleNView": {
-						"buttons": [{
-							"type": "share"
-						}]
+						"buttons": [
+							{
+								"type": "share"
+							}
+						]
 					}
 				}
 				// #endif
 			}
-
 		},
 		{
 			"path": "uni_modules/uni-upgrade-center-app/pages/upgrade-popup",
@@ -87,10 +96,10 @@
 					"popGesture": "none",
 					"animationType": "fade-in",
 					"animationDuration": 200
-
 				}
 			}
-		}, {
+		},
+		{
 			"path": "pages/uni-agree/uni-agree",
 			"style": {
 				"navigationStyle": "custom",
@@ -98,52 +107,58 @@
 					"popGesture": "none"
 				}
 			}
-		}, {
+		},
+		{
 			"path": "pages/ucenter/settings/settings",
 			"style": {
 				"navigationBarTitleText": "设置"
 			}
-
-		}, {
+		},
+		{
 			"path": "pages/ucenter/userinfo/userinfo",
 			"style": {
 				"navigationBarTitleText": "个人资料"
 			}
-		}, {
+		},
+		{
 			"path": "pages/ucenter/userinfo/cropImage",
 			"style": {
 				"navigationStyle": "custom"
 			}
-		}, {
+		},
+		{
 			"path": "pages/ucenter/login-page/pwd-login/pwd-login",
 			"style": {
 				"navigationBarTitleText": ""
 			}
-		}, {
+		},
+		{
 			"path": "pages/ucenter/login-page/pwd-retrieve/pwd-retrieve",
 			"style": {
 				"navigationBarTitleText": "重置密码"
 			}
-		}, {
+		},
+		{
 			"path": "pages/ucenter/login-page/phone-code/phone-code",
 			"style": {
 				"navigationBarTitleText": ""
 			}
-
-		}, {
+		},
+		{
 			"path": "pages/common/webview/webview",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
-
-		}, {
+		},
+		{
 			"path": "pages/ucenter/login-page/register/register",
 			"style": {
 				"navigationBarTitleText": "注册",
 				"enablePullDownRefresh": false
 			}
-		}, {
+		},
+		{
 			"path": "pages/ucenter/login-page/register/phone-number",
 			"style": {
 				"navigationBarTitleText": "注册",
@@ -156,103 +171,121 @@
 				"navigationBarTitleText": "阅读记录",
 				"enablePullDownRefresh": true
 			}
-		}, {
+		},
+		{
 			"path": "pages/ucenter/invite/invite",
 			"style": {
 				"navigationStyle": "custom",
 				"enablePullDownRefresh": false
 			}
-
-		}, {
+		},
+		{
 			"path": "pages/ucenter/settings/deactivate/deactivate",
 			"style": {
 				"navigationBarTitleText": "注销提醒",
 				"enablePullDownRefresh": false
 			}
-		}, {
+		},
+		{
 			"path": "uni_modules/uni-feedback/pages/opendb-feedback/opendb-feedback",
 			"style": {
 				"navigationBarTitleText": "意见反馈",
 				"enablePullDownRefresh": false
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-membership/add",
 			"style": {
 				"navigationBarTitleText": "新增"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-membership/edit",
 			"style": {
 				"navigationBarTitleText": "编辑"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-membership/list",
 			"style": {
 				"navigationBarTitleText": "列表"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-membership/memberCenter",
 			"style": {
 				"navigationStyle": "custom"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-game/add",
 			"style": {
 				"navigationBarTitleText": "新增"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-game/edit",
 			"style": {
 				"navigationBarTitleText": "编辑"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-game/list",
 			"style": {
 				"navigationBarTitleText": "列表"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-game/detail",
 			"style": {
 				"navigationBarTitleText": "选择区服"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-myspeed/list",
 			"style": {
 				"navigationBarTitleText": "我的加速"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-myspeed/detail",
 			"style": {
 				"navigationBarTitleText": "我的加速",
 				"backgroundColor": "#000"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-myspeed/autospeed",
 			"style": {
 				"navigationBarTitleText": "我的加速",
 				"backgroundColor": "#000"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-membership/detail",
 			"style": {
 				"navigationBarTitleText": "详情"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-member-plan/add",
 			"style": {
 				"navigationBarTitleText": "新增"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-member-plan/edit",
 			"style": {
 				"navigationBarTitleText": "编辑"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-member-plan/list",
 			"style": {
 				"navigationBarTitleText": "列表"
 			}
-		}, {
+		},
+		{
 			"path": "pages/speednet-member-plan/detail",
 			"style": {
 				"navigationBarTitleText": "详情"
@@ -267,14 +300,17 @@
 		"enablePullDownRefresh": false
 	},
 	"condition": {
-		"list": [{
+		"list": [
+			{
 				"path": "pages/list/detail"
-			}, {
+			},
+			{
 				"path": "pages/list/list"
 			},
 			{
 				"path": "pages/ucenter/login-page/index/index"
-			}, {
+			},
+			{
 				"path": "pages/ucenter/userinfo/userinfo"
 			},
 			{
@@ -288,7 +324,8 @@
 		"selectedColor": "#007AFF",
 		"borderStyle": "black",
 		"backgroundColor": "#FFFFFF",
-		"list": [{
+		"list": [
+			{
 				"pagePath": "pages/list/list",
 				"iconPath": "static/tabbar/grid.png",
 				"selectedIconPath": "static/tabbar/grid_active.png",
@@ -299,7 +336,8 @@
 				"iconPath": "static/tabbar/list.png",
 				"selectedIconPath": "static/tabbar/list_active.png",
 				"text": "加速"
-			}, {
+			},
+			{
 				"pagePath": "pages/speednet-membership/memberCenter",
 				"iconPath": "static/tabbar/me.png",
 				"selectedIconPath": "static/tabbar/me_active.png",
