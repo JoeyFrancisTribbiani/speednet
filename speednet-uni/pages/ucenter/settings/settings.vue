@@ -2,26 +2,34 @@
 	<view class="content">
 		<!-- 功能列表 -->
 		<uni-list class="mt10" :border="false">
-			<uni-list-item :title="$t('settings.userInfo')" to="/pages/ucenter/userinfo/userinfo" link="navigateTo"></uni-list-item>
-			<uni-list-item v-if="userInfo.mobile" :title="$t('settings.changePassword')" :to="'/pages/ucenter/login-page/pwd-retrieve/pwd-retrieve?phoneNumber='+ userInfo.mobile" link="navigateTo"></uni-list-item>
+			<uni-list-item :title="$t('settings.userInfo')" to="/pages/ucenter/userinfo/userinfo" link="navigateTo">
+			</uni-list-item>
+			<uni-list-item v-if="userInfo.mobile" :title="$t('settings.changePassword')"
+				:to="'/pages/ucenter/login-page/pwd-retrieve/pwd-retrieve?phoneNumber='+ userInfo.mobile"
+				link="navigateTo"></uni-list-item>
 		</uni-list>
 		<uni-list class="mt10" :border="false">
-		<!-- #ifndef H5 -->
+			<!-- #ifndef H5 -->
 			<!-- #ifdef APP-PLUS -->
-			<!-- 检查push过程未结束不显示，push设置项 -->
 			<uni-list-item :title="$t('settings.clearTmp')" @click="clearTmp" link></uni-list-item>
-			<uni-list-item v-show="pushIsOn != 'wait'" :title="$t('settings.pushServer')" @click.native="pushIsOn?pushServer.off():pushServer.on()"  showSwitch :switchChecked="pushIsOn"></uni-list-item>
+			<!-- 检查push过程未结束不显示，push设置项 -->
+			<!-- 			
+			<uni-list-item v-show="pushIsOn != 'wait'" :title="$t('settings.pushServer')"
+				@click.native="pushIsOn?pushServer.off():pushServer.on()" showSwitch :switchChecked="pushIsOn">
+			</uni-list-item> -->
 			<!-- #endif -->
-			<uni-list-item v-if="supportMode.includes('fingerPrint')" :title="$t('settings.fingerPrint')" @click.native="startSoterAuthentication('fingerPrint')" link></uni-list-item>
-			<uni-list-item v-if="supportMode.includes('facial')" :title="$t('settings.facial')" @click="startSoterAuthentication('facial')" link></uni-list-item>
-		<!-- #endif -->
-			<uni-list-item v-if="i18nEnable" :title="$t('settings.changeLanguage')" @click="changeLanguage" :rightText="currentLanguage" link></uni-list-item>
+			<!-- <uni-list-item v-if="supportMode.includes('fingerPrint')" :title="$t('settings.fingerPrint')" @click.native="startSoterAuthentication('fingerPrint')" link></uni-list-item> -->
+			<!-- 			<uni-list-item v-if="supportMode.includes('facial')" :title="$t('settings.facial')"
+				@click="startSoterAuthentication('facial')" link></uni-list-item> -->
+			<!-- #endif -->
+			<uni-list-item v-if="i18nEnable" :title="$t('settings.changeLanguage')" @click="changeLanguage"
+				:rightText="currentLanguage" link></uni-list-item>
 		</uni-list>
-		
+
 		<uni-list class="mt10" :border="false">
 			<uni-list-item @click="deactivate" :title="$t('settings.deactivate')" link="navigateTo"></uni-list-item>
 		</uni-list>
-		
+
 		<!-- 退出/登录 按钮 -->
 		<view class="bottom-back" @click="clickLogout">
 			<text class="bottom-back-text" v-if="hasLogin">{{$t('settings.logOut')}}</text>
@@ -40,10 +48,10 @@
 	export default {
 		data() {
 			return {
-				pushServer:pushServer,
-				supportMode:[],
-				pushIsOn:"wait",
-				currentLanguage:""
+				pushServer: pushServer,
+				supportMode: [],
+				pushIsOn: "wait",
+				currentLanguage: ""
 			}
 		},
 		computed: {
@@ -51,34 +59,34 @@
 				'userInfo': 'user/info',
 				'hasLogin': 'user/hasLogin',
 			}),
-			i18nEnable(){
+			i18nEnable() {
 				return getApp().globalData.config.i18n.enable
 			}
 		},
 		onLoad() {
-			this.currentLanguage = uni.getStorageSync('CURRENT_LANG') == "en"?'English':'简体中文'
-			
+			this.currentLanguage = uni.getStorageSync('CURRENT_LANG') == "en" ? 'English' : '简体中文'
+
 			uni.setNavigationBarTitle({
 				title: this.$t('settings.navigationBarTitle')
 			})
-			// #ifdef APP-PLUS || MP-WEIXIN
-			uni.checkIsSupportSoterAuthentication({
-				success: (res) => {
-					console.log(res);
-					this.supportMode = res.supportMode
-				},
-				fail: (err) => {
-					console.log(err);
-				}
-			})
-			// #endif
+			// // #ifdef APP-PLUS || MP-WEIXIN
+			// uni.checkIsSupportSoterAuthentication({
+			// 	success: (res) => {
+			// 		console.log(res);
+			// 		this.supportMode = res.supportMode
+			// 	},
+			// 	fail: (err) => {
+			// 		console.log(err);
+			// 	}
+			// })
+			// // #endif
 		},
 		onShow() {
 			// 检查手机端获取推送是否开启
 			//#ifdef APP-PLUS
-			setTimeout(()=>{
+			setTimeout(() => {
 				this.pushIsOn = pushServer.isOn();
-			},300)
+			}, 300)
 			//#endif
 		},
 		methods: {
@@ -90,15 +98,15 @@
 					url: '/pages/ucenter/userinfo/userinfo'
 				});
 			},
-			deactivate(){
+			deactivate() {
 				uni.navigateTo({
-					url:"/pages/ucenter/settings/deactivate/deactivate"
+					url: "/pages/ucenter/settings/deactivate/deactivate"
 				})
 			},
 			changePwd() {
 				uni.navigateTo({
-					url: '/pages/ucenter/login-page/pwd-retrieve/pwd-retrieve?phoneNumber='
-						+ (this.userInfo && this.userInfo.mobile ? this.userInfo.mobile : ''),
+					url: '/pages/ucenter/login-page/pwd-retrieve/pwd-retrieve?phoneNumber=' +
+						(this.userInfo && this.userInfo.mobile ? this.userInfo.mobile : ''),
 					fail: err => {
 						console.log(err);
 					}
@@ -109,16 +117,22 @@
 			 */
 			startSoterAuthentication(checkAuthMode) {
 				console.log(checkAuthMode);
-				let title = {"fingerPrint":this.$t('settings.fingerPrint'),"facial":this.$t('settings.facial')}[checkAuthMode]
+				let title = {
+					"fingerPrint": this.$t('settings.fingerPrint'),
+					"facial": this.$t('settings.facial')
+				} [checkAuthMode]
 				// 检查是否开启认证
-				this.checkIsSoterEnrolledInDevice({checkAuthMode,title})
+				this.checkIsSoterEnrolledInDevice({
+						checkAuthMode,
+						title
+					})
 					.then(() => {
-						console.log(checkAuthMode,title);
+						console.log(checkAuthMode, title);
 						// 开始认证
 						uni.startSoterAuthentication({
 							requestAuthModes: [checkAuthMode],
 							challenge: '123456', // 微信端挑战因子
-							authContent: this.$t('settings.please')+ " " + `${title}`,
+							authContent: this.$t('settings.please') + " " + `${title}`,
 							complete: (res) => {
 								console.log(res);
 							},
@@ -133,12 +147,12 @@
 									 * 微信小程序需要再次通过后台验证resultJSON与resultJSONSignature获取最终结果
 									 */
 									return uni.showToast({
-										title: `${title}`+this.$t('settings.successText'),
+										title: `${title}` + this.$t('settings.successText'),
 										icon: 'none'
 									});
 								}
 								uni.showToast({
-									title:this.$t('settings.failTip'),
+									title: this.$t('settings.failTip'),
 									icon: 'none'
 								});
 							},
@@ -146,7 +160,7 @@
 								console.log(err);
 								console.log(`认证失败:${err.errCode}`);
 								uni.showToast({
-									title:this.$t('settings.authFailed'),
+									title: this.$t('settings.authFailed'),
 									// title: `认证失败`,
 									icon: 'none'
 								});
@@ -154,7 +168,10 @@
 						})
 					})
 			},
-			checkIsSoterEnrolledInDevice({checkAuthMode,title}) {
+			checkIsSoterEnrolledInDevice({
+				checkAuthMode,
+				title
+			}) {
 				return new Promise((resolve, reject) => {
 					uni.checkIsSoterEnrolledInDevice({
 						checkAuthMode,
@@ -164,7 +181,7 @@
 								return resolve(res);
 							}
 							uni.showToast({
-								title: this.$t('settings.deviceNoOpen')+ `${title}`,
+								title: this.$t('settings.deviceNoOpen') + `${title}`,
 								icon: 'none'
 							});
 							reject(res);
@@ -219,11 +236,11 @@
 					）
 				*/
 				uni.getSavedFileList({
-					success:res=>{
+					success: res => {
 						if (res.fileList.length > 0) {
 							uni.removeSavedFile({
 								filePath: res.fileList[0].filePath,
-								complete:res=>{
+								complete: res => {
 									console.log(res);
 									uni.hideLoading()
 									uni.showToast({
@@ -232,7 +249,7 @@
 									});
 								}
 							});
-						}else{
+						} else {
 							uni.hideLoading()
 							uni.showToast({
 								title: this.$t('settings.clearedSuccessed'),
@@ -240,21 +257,21 @@
 							});
 						}
 					},
-					complete:e=>{
+					complete: e => {
 						console.log(e);
 					}
 				});
 			},
-			changeLanguage(){
+			changeLanguage() {
 				console.log('语言切换')
 				uni.showActionSheet({
-					itemList: ["English","简体中文"],
+					itemList: ["English", "简体中文"],
 					success: res => {
-						console.log(res.tapIndex); 
+						console.log(res.tapIndex);
 						let language = uni.getStorageSync('CURRENT_LANG')
-						if(
-							!res.tapIndex && language=='zh-Hans' || res.tapIndex && language=='en'
-						){
+						if (
+							!res.tapIndex && language == 'zh-Hans' || res.tapIndex && language == 'en'
+						) {
 							const globalData = getApp().globalData
 							if (language === 'en') {
 								language = globalData.locale = 'zh-Hans'
@@ -263,14 +280,14 @@
 							}
 							uni.setStorageSync('CURRENT_LANG', language)
 							getApp().globalData.$i18n.locale = language
-							this.currentLanguage = res.tapIndex?'简体中文':'English'
-							if(uni.setLocale){
+							this.currentLanguage = res.tapIndex ? '简体中文' : 'English'
+							if (uni.setLocale) {
 								uni.setLocale(language)
 							}
 							uni.reLaunch({
 								url: '/pages/list/list',
 								complete: () => {
-									uni.$emit("changeLanguage",language)
+									uni.$emit("changeLanguage", language)
 								}
 							})
 						}
@@ -295,6 +312,7 @@
 		border: none;
 		border-radius: 0;
 	}
+
 	/* #endif */
 	.content {
 		/* #ifndef APP-NVUE */
@@ -332,14 +350,17 @@
 	.mt10 {
 		margin-top: 10px;
 	}
+
 	/* #ifndef APP-NVUE  || VUE3 */
 	.content /deep/ .uni-list {
 		background-color: #F9F9F9;
 	}
-	.content /deep/ .uni-list-item--disabled,.list-item {
+
+	.content /deep/ .uni-list-item--disabled,
+	.list-item {
 		height: 50px;
 		margin-bottom: 1px;
 	}
-	/* #endif */
 
+	/* #endif */
 </style>

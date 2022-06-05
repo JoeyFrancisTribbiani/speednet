@@ -1,0 +1,1 @@
+electron-packager . 新起点加速器 --platform=win32 --arch=x64  --out=./out --app-version=1.0.0 --overwrite --ignore=node_modules --electron-version 18.1.0

@@ -10,7 +10,9 @@ const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
     startVpn: (config) => ipcRenderer.send('start-vpn', config),
-    stopVpn: (config) => ipcRenderer.send('stop-vpn', config)
+    stopVpn: (config) => ipcRenderer.send('stop-vpn', config),
+    openAtLogin: (config) => ipcRenderer.send('open-at-login', config),
+    appStart: (callback) => ipcRenderer.on('app-start', callback)
 })
 
 
